@@ -21,15 +21,7 @@ exports.ftsearch = function(source, operator, options) {
     var results = index.search(operator.operand);
     // XXX use callback instead?
     return results.map(function(match) {
-	if($tw.wiki.getTiddler(match.ref) === undefined) {
-            // XXX vaccuum process
-	    index.remove(match.ref);
-	    return undefined;
-	} else {
-	    return match.ref;
-	}
-    }).filter(function(title) {
-	return title !== undefined;
+        return match.ref;
     });
 };
 
