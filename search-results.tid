@@ -1,0 +1,22 @@
+title: $:/plugins/hoelzro/full-text-search/search-results
+type: text/vnd.tiddlywiki
+tags: $:/tags/SearchResults
+caption: Full Text Results
+
+\define searchResults()
+<$set name="resultCount" value="""<$count filter="[ftsearch{$(searchTiddler)$}]"/>""">
+{{$:/language/Search/Matches}}
+</$set>
+
+{{{ [ftsearch{$(searchTiddler)$}] }}}
+\end
+
+<$set name="state" value="$:/temp/FTS-state">
+<$reveal type="match" state=<<state>> text="initialized">
+<<searchResults>>
+</$reveal>
+
+<$reveal type="nomatch" state=<<state>> text="initialized">
+Search index not initialized; please initialize it in the [[Control Panel|$:/ControlPanel]].
+</$reveal>
+</$set>

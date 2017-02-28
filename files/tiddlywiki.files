@@ -1,0 +1,13 @@
+{
+	"tiddlers": [
+		{
+			"file": "lunr.min.js",
+			"fields": {
+				"type": "application/javascript",
+				"title": "$:/plugins/hoelzro/full-text-search/lunr.min.js",
+				"module-type": "library"
+			}
+		}
+	]
+}
+
