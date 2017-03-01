@@ -13,4 +13,3 @@ the course of your whole session.
 
   * Persist the index across sessions using local storage or similar.
   * Specify a filter for tiddlers to be included in the index.
-  * Vacuum removed tiddlers instead of filtering them from the result list.
