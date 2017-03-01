@@ -16,11 +16,17 @@ var getIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js').ge
 Export our filter function
 */
 exports.ftsearch = function(source, operator, options) {
-    // XXX make use of source (that filter below won't be needed if you do)
+    var sourceLookup = {};
+    source(function(tiddler, title) {
+        sourceLookup[title] = true;
+    });
+
     var index = getIndex();
     var results = index.search(operator.operand);
-    // XXX use callback instead?
-    return results.map(function(match) {
+
+    return results.filter(function(match) {
+        return sourceLookup.hasOwnProperty(match.ref);
+    }).map(function(match) {
         return match.ref;
     });
 };
