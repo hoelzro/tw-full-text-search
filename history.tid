@@ -3,6 +3,10 @@ type: text/vnd.tiddlywiki
 
 ! Release History
 
+!! 0.0.2
+
+Added stashing away current index in web storage to avoid repeated index creation/cut down on index creation time.
+
 !! 0.0.1
 
 Basic full-text search functionality.
