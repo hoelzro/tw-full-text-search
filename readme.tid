@@ -13,6 +13,5 @@ Requires [[$:/hoelzro/progressbar]] to display progress when generating the inde
 
 ! Ideas for Future Enhancement
 
-  * Persist the index across sessions using local storage or similar.
   * Specify a filter for tiddlers to be included in the index.
   * Custom stemmers for non-English/mixed language wikis
