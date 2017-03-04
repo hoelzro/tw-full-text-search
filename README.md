@@ -6,7 +6,10 @@ build the index.  There's a tab in the control panel
 with a button to do this; the index will last over
 the course of your whole session.
 
+Requires [$:/hoelzro/progressbar](https://github.com/hoelzro/tw-progress-bar)
+to display progress when generating the index.
+
 # Ideas for Future Enhancement
 
-  * Persist the index across sessions using local storage or similar.
   * Specify a filter for tiddlers to be included in the index.
+  * Custom stemmers for non-English/mixed language wikis
