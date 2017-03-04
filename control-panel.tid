@@ -23,7 +23,14 @@ Generating index...
 </$reveal>
 
 <$reveal type="match" state=<<state>> text="initialized">
+
 Index generated.  Happy searching!
+
+<$button>
+  Click here to rebuild the index
+  <$fts-action-generate-index rebuild="true" />
+</$button>
+
 </$reveal>
 
 </$set>
