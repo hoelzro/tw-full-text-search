@@ -1,10 +1,12 @@
 TSC=tsc
 TSCFLAGS=--pretty --lib ES2015 --module commonjs --alwaysStrict
 
-all: test.js
+JS_FILES=$(shell ls *.ts | perl -npe 's/[.]ts$$/.js/')
+
+all: $(JS_FILES)
 
 clean:
-	rm -f test.js # XXX FIXME
+	rm -f $(JS_FILES)
 
 %.js: %.ts
 	@# for some reason, TypeScript appears to write the file out anyway?
