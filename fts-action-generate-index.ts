@@ -12,12 +12,12 @@ declare var require;
 declare var $tw;
 declare var exports; // XXX until I figure it out
 
+import * as SharedIndex from './shared-index';
+var sharedIndex : typeof SharedIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js');
+
 module FTSActionGenerateIndex {
     const STATE_TIDDLER    = '$:/temp/FTS-state';
     const UPDATE_FREQUENCY = 10;
-
-    // XXX I would love to be able to figure this out..
-    var sharedIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js');
 
     class FTSActionGenerateIndexWidget extends Widget {
         constructor(parseTreeNode, options) {
