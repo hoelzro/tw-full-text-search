@@ -67,3 +67,5 @@ module FTSActionGenerateIndex {
 }
 
 export = FTSActionGenerateIndex;
+
+// vim:sts=4:sw=4

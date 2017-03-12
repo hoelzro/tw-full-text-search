@@ -16,3 +16,5 @@ module SaveTiddlerHook {
         return tiddler;
     });
 }
+
+// vim:sts=4:sw=4

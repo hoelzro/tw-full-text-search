@@ -85,3 +85,5 @@ module SharedIndex {
     };
 }
 export = SharedIndex;
+
+// vim:sts=4:sw=4

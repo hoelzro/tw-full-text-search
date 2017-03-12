@@ -29,3 +29,5 @@ module FTSearch {
 }
 
 export = FTSearch;
+
+// vim:sts=4:sw=4
