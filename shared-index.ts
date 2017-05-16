@@ -24,29 +24,29 @@ module SharedIndex {
 
     var initialized = false;
 
-    export function buildIndex(tiddlers, progressCallback) {
-        var i = 0;
-        var indexSingleTiddler = function indexSingleTiddler() {
-            while(i < tiddlers.length) {
-                var tiddler = $tw.wiki.getTiddler(tiddlers[i]);
-                i++;
-                if(tiddler === undefined) { // avoid drafts that were open when we started
-                    continue;
-                }
-                var type = tiddler.fields.type || 'text/vnd.tiddlywiki';
-                if(!type.startsWith('text/')) {
-                    continue;
-                }
-                index.add(tiddler.fields);
-                if(i < tiddlers.length) {
-                    setTimeout(indexSingleTiddler, 1);
-                }
-                progressCallback(i);
+    async function delay(millis : number) {
+        return new Promise(resolve => {
+            setTimeout(resolve, millis);
+        });
+    }
 
-                break;
+    export async function buildIndex(tiddlers, progressCallback) {
+        let i = 0;
+        for(let title of tiddlers) {
+            let tiddler = $tw.wiki.getTiddler(title);
+
+            if(tiddler === undefined) { // avoid drafts that were open when we started
+                continue;
             }
-        };
-        setTimeout(indexSingleTiddler, 1);
+            var type = tiddler.fields.type || 'text/vnd.tiddlywiki';
+            if(!type.startsWith('text/')) {
+                continue;
+            }
+            index.add(tiddler.fields);
+            progressCallback(++i);
+            await delay(1);
+        }
+        progressCallback(tiddlers.length);
     };
 
     export function getIndex() {

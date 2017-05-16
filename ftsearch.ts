@@ -25,7 +25,6 @@ module FTSearch {
             return match.ref;
         });
     };
-
 }
 
 export = FTSearch;
