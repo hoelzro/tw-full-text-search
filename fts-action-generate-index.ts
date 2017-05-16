@@ -66,6 +66,4 @@ module FTSActionGenerateIndex {
     exports['fts-action-generate-index'] = FTSActionGenerateIndexWidget;
 }
 
-export = FTSActionGenerateIndex;
-
 // vim:sts=4:sw=4
