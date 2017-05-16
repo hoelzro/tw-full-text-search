@@ -13,15 +13,6 @@ declare var setInterval;
 module SharedIndex {
     var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
 
-    var documents = {};
-    function onAddDocument(doc) {
-        documents[doc.title] = true;
-    }
-
-    function onRemoveDocument(doc) {
-        delete documents[doc.title];
-    }
-
     var index = lunr(function() {
         // XXX configurable boost? configurable fields?
         this.field('title', {boost: 10})
@@ -29,29 +20,9 @@ module SharedIndex {
         this.field('text');
 
         this.ref('title');
-
-        this.on('add', onAddDocument);
-        this.on('remove', onRemoveDocument);
     });
 
     var initialized = false;
-
-    function vacuumProcess() {
-        var tiddlers = $tw.wiki.getTiddlers();
-        var tiddlerLookup = {};
-
-        for(var i = 0; i < tiddlers.length; i++) {
-            tiddlerLookup[tiddlers[i]] = true;
-        }
-        for(var k in documents) {
-            if(! documents.hasOwnProperty(k)) {
-                continue;
-            }
-            if(! (k in tiddlerLookup)) {
-                index.remove({ title: k });
-            }
-        }
-    }
 
     export function buildIndex(tiddlers, progressCallback) {
         var i = 0;
@@ -69,8 +40,6 @@ module SharedIndex {
                 index.add(tiddler.fields);
                 if(i < tiddlers.length) {
                     setTimeout(indexSingleTiddler, 1);
-                } else {
-                    setInterval(vacuumProcess, 60000);
                 }
                 progressCallback(i);
 

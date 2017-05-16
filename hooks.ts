@@ -1,5 +1,5 @@
 /*\
-title: $:/plugins/hoelzro/full-text-search/save-tiddler-hook.js
+title: $:/plugins/hoelzro/full-text-search/hooks.js
 type: text/vnd.tiddlywiki
 module-type: startup
 
@@ -14,6 +14,10 @@ module SaveTiddlerHook {
     $tw.hooks.addHook('th-saving-tiddler', function(tiddler) {
         getIndex().update(tiddler.fields);
         return tiddler;
+    });
+
+    $tw.hooks.addHook('th-deleting-tiddler', function(tiddler) {
+        getIndex().remove({ title: tiddler.fields.title });
     });
 }
 
