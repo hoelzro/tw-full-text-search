@@ -38,7 +38,8 @@ module FTSActionGenerateIndex {
         }
 
         invokeAction(triggeringWidget, event) {
-            var tiddlers = this.wiki.getTiddlers();
+            var filter = '[!is[system]]';
+            var tiddlers = this.wiki.compileFilter(filter)();
             var stateTiddler = this.wiki.getTiddler(STATE_TIDDLER);
             var fields = {
                 text: 'initializing',
