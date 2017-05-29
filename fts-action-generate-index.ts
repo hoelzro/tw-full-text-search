@@ -41,7 +41,7 @@ module FTSActionGenerateIndex {
         }
 
         invokeAction(triggeringWidget, event) {
-            var rebuilding = false;
+            var rebuilding = this.getAttribute('rebuild') === 'true';
             var filter = '[!is[system]]';
             var tiddlers;
 
