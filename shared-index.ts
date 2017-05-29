@@ -52,6 +52,10 @@ module SharedIndex {
     export function getIndex() {
         return index;
     };
+
+    export function load(data) {
+        index = lunr.Index.load(data);
+    }
 }
 export = SharedIndex;
 
