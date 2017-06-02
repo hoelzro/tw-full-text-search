@@ -7,7 +7,10 @@ module-type: library
 
 declare var $tw;
 declare var window;
-declare var localStorage;
+declare var require;
+
+import * as LocalForageModule from 'localforage';
+var localForage : typeof LocalForageModule = require('$:/plugins/hoelzro/full-text-search/localforage.min.js');
 
 module FTSCache {
   function hasFunctionalCache() {
@@ -15,57 +18,44 @@ module FTSCache {
       return false;
     }
 
-    if(! ('localStorage' in window && 'JSON' in window)) {
-        return false;
-    }
+    // XXX check to see if localForage is working
 
     return true;
   }
 
-  function getCacheMetadata() {
+  interface CacheMeta {
+    age: number;
+  }
+
+  async function getCacheMetadata() {
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
-    var cacheMeta = localStorage.getItem(metaKey);
+    // XXX how does TS handle the case where the cache item doesn't have the right keys?
+    var cacheMeta = await localForage.getItem<CacheMeta>(metaKey);
     if(cacheMeta === null) {
       return;
-    }
-    try {
-      cacheMeta = JSON.parse(cacheMeta);
-    } catch(e) {
-      if(e instanceof SyntaxError) {
-        return;
-      }
-      throw e;
     }
 
     return cacheMeta;
   }
 
-  function getCacheData() {
+  // XXX what about migrating between lunr versions? what about invalid data under the key?
+  async function getCacheData() {
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
-    var cacheData = localStorage.getItem(dataKey);
+    var cacheData = await localForage.getItem(dataKey);
 
     if(cacheData === null) {
       return null;
     }
 
-    try {
-      cacheData = JSON.parse(cacheData);
-    } catch(e) {
-      if(e instanceof SyntaxError) {
-        return null;
-      }
-      throw e;
-    }
-
     return cacheData;
   }
 
-  export function getAge() {
+  export async function getAge() {
     if(!hasFunctionalCache()) {
       return 0;
     }
 
-    var cacheMeta = getCacheMetadata();
+    var cacheMeta = await getCacheMetadata();
     if(!cacheMeta) {
       return 0;
     }
@@ -90,8 +80,8 @@ module FTSCache {
     data = JSON.stringify(data);
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
-    localStorage.setItem(dataKey, data);
-    localStorage.setItem(metaKey, JSON.stringify({ age: age }));
+    localForage.setItem(dataKey, data);
+    localForage.setItem(metaKey, JSON.stringify({ age: age }));
   }
 }
 

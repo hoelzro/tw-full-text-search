@@ -91,7 +91,7 @@ module FTSActionGenerateIndex {
                         lastUpdate = progressCurrent;
                     }
                     if(progressCurrent == tiddlers.length) {
-                        cache.save(age, sharedIndex.getIndex().toJSON());
+                        await cache.save(age, sharedIndex.getIndex().toJSON());
                         var stateTiddler = self.wiki.getTiddler(STATE_TIDDLER);
                         self.wiki.addTiddler(new $tw.Tiddler(stateTiddler, { text: 'initialized', progressCurrent: progressCurrent }, self.wiki.getModificationFields()));
                     }
