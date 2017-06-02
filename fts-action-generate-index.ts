@@ -40,14 +40,14 @@ module FTSActionGenerateIndex {
             return this.refreshChildren(changedTiddlers);
         }
 
-        invokeAction(triggeringWidget, event) {
+        async asyncInvokeAction() {
             var rebuilding = this.getAttribute('rebuild') === 'true';
             var filter = '[!is[system]]';
             var tiddlers;
 
-            var cacheData = rebuilding ? null : cache.load();
+            var cacheData = rebuilding ? null : await cache.load();
             if(cacheData) {
-                var cacheAge = cache.getAge();
+                var cacheAge = await cache.getAge();
                 filter += ' +[nsort[modified]]';
                 var titles = this.wiki.compileFilter(filter)();
                 tiddlers = [];
@@ -84,7 +84,7 @@ module FTSActionGenerateIndex {
 
                 var self = this;
                 var lastUpdate = 0;
-                sharedIndex.buildIndex(tiddlers, function(progressCurrent) {
+                sharedIndex.buildIndex(tiddlers, async function(progressCurrent) {
                     if((progressCurrent - lastUpdate) >= UPDATE_FREQUENCY) {
                         var stateTiddler = self.wiki.getTiddler(STATE_TIDDLER);
                         self.wiki.addTiddler(new $tw.Tiddler(stateTiddler, { progressCurrent: progressCurrent }, self.wiki.getModificationFields()));
@@ -99,6 +99,10 @@ module FTSActionGenerateIndex {
             } else {
                 this.wiki.addTiddler(new $tw.Tiddler(stateTiddler, { text: 'initialized', progressCurrent: 1, progressTotal: 1 }, this.wiki.getModificationFields()));
             }
+        }
+
+        invokeAction(triggeringWidget, event) {
+            this.asyncInvokeAction();
         }
     }
 
