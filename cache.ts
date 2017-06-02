@@ -77,11 +77,10 @@ module FTSCache {
   }
 
   export function save(age, data) {
-    data = JSON.stringify(data);
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     localForage.setItem(dataKey, data);
-    localForage.setItem(metaKey, JSON.stringify({ age: age }));
+    localForage.setItem(metaKey, { age: age });
   }
 }
 
