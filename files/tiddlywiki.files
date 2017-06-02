@@ -7,6 +7,14 @@
 				"title": "$:/plugins/hoelzro/full-text-search/lunr.min.js",
 				"module-type": "library"
 			}
+		},
+		{
+			"file": "localforage.min.js",
+			"fields": {
+				"type": "application/javascript",
+				"title": "$:/plugins/hoelzro/full-text-search/localforage.min.js",
+				"module-type": "library"
+			}
 		}
 	]
 }
