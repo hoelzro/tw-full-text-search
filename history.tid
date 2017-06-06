@@ -3,6 +3,10 @@ type: text/vnd.tiddlywiki
 
 ! Release History
 
+!! 0.0.3
+
+Fix bug with web storage index serialization/deserialization.
+
 !! 0.0.2
 
 Added stashing away current index in web storage to avoid repeated index creation/cut down on index creation time.
