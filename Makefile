@@ -5,7 +5,7 @@ JS_FILES=$(shell ls *.ts | perl -npe 's/[.]ts$$/.js/')
 
 all: fts.html
 
-fts.html: .build-wiki $(JS_FILES) $(TID_FILES)
+fts.html: .build-wiki $(JS_FILES) $(TID_FILES) plugin.info
 	mkdir -p .build-wiki/plugins/full-text-search
 	cp *.js .build-wiki/plugins/full-text-search
 	cp *.tid .build-wiki/plugins/full-text-search
