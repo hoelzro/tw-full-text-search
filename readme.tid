@@ -9,7 +9,7 @@ build the index.  There's a tab in the control panel
 with a button to do this; the index will last over
 the course of your whole session.
 
-Requires [[$:/hoelzro/progressbar]] to display progress when generating the index.
+Requires [[$:/plugins/hoelzro/progressbar]] to display progress when generating the index.
 
 ! Ideas for Future Enhancement
 
