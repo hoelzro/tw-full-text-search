@@ -80,7 +80,7 @@ Click and drag these two plugins into your wiki, then save and reload:
 
 ! Usage
 
-Each time you start a new TiddlyWiki session, you'll need to build the FTS index.  You can do this from a tab in the [[$:/ControlPanel]].  Older versions of the index are retained in web storage, so it should be pretty quick after the first time!  After you build the index, you can just search as you would normally.
+Each time you start a new ~TiddlyWiki session, you'll need to build the FTS index.  You can do this from a tab in the [[$:/ControlPanel]].  Older versions of the index are retained in web storage, so it should be pretty quick after the first time!  After you build the index, you can just search as you would normally.
 
 ! Ideas for Future Enhancement
 
