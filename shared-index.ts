@@ -13,14 +13,7 @@ declare var setInterval;
 module SharedIndex {
     var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
 
-    var index = lunr(function() {
-        // XXX configurable boost? configurable fields?
-        this.field('title', {boost: 10})
-        this.field('tags', {boost: 5});
-        this.field('text');
-
-        this.ref('title');
-    });
+    let index;
 
     var initialized = false;
 
@@ -30,7 +23,18 @@ module SharedIndex {
         });
     }
 
-    export async function buildIndex(tiddlers, progressCallback) {
+    export async function buildIndex(tiddlers, rebuilding, progressCallback) {
+        if(rebuilding || !index) {
+            index = lunr(function() {
+                // XXX configurable boost? configurable fields?
+                this.field('title', {boost: 10})
+                this.field('tags', {boost: 5});
+                this.field('text');
+
+                this.ref('title');
+            });
+        }
+
         let i = 0;
         for(let title of tiddlers) {
             let tiddler = $tw.wiki.getTiddler(title);
