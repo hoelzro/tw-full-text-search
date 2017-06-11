@@ -1,3 +1,4 @@
 --type-add=ts:ext:ts
 --nojs
 --nohtml
+--ignore-dir=.build-wiki
