@@ -97,4 +97,4 @@ https://github.com/hoelzro/tw-full-text-search/
 
 https://github.com/hoelzro/tw-progress-bar
 
-Requires [[$:/plugins/hoelzro/progressbar]] to display progress when generating the index.
+Requires [[$:/plugins/hoelzro/progress-bar]] to display progress when generating the index.
