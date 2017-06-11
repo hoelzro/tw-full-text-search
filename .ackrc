@@ -1,2 +1,3 @@
 --type-add=ts:ext:ts
 --nojs
+--nohtml
