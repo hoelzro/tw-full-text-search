@@ -44,7 +44,7 @@ module SharedIndex {
             if(!type.startsWith('text/')) {
                 continue;
             }
-            index.add(tiddler.fields);
+            index.update(tiddler.fields);
             progressCallback(++i);
             await delay(1);
         }
