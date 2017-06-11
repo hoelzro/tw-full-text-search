@@ -3,6 +3,11 @@ type: text/vnd.tiddlywiki
 
 ! Release History
 
+!! 0.0.4
+
+Fix bug where deleted content from a tiddler would still affect search results if a
+partial index is loaded from the web storage cache.
+
 !! 0.0.3
 
 Fix bug with web storage index serialization/deserialization.
