@@ -6,26 +6,26 @@ On my personal wiki, I have the problem that there are terms I use across a lot 
 
 This plugin should be considered as **BETA** quality - I use it pretty much every day, but there's definitely room for improvement.  Please [let me know](https://github.com/hoelzro/tw-full-text-search/issues) if there are any bugs!
 
-! Demo
+# Demo
 
 https://hoelz.ro/files/fts.html
 
-! Installation
+# Installation
 
 https://hoelz.ro/files/fts.html
 
-! Usage
+# Usage
 
 Each time you start a new TiddlyWiki session, you'll need to build the FTS index.  You can do this from a tab in the `$:/ControlPanel`.  Older versions of the index are retained in web storage, so it should be pretty quick after the first time!  After you build the index, you can just search as you would normally.
 
-! Ideas for Future Enhancement
+# Ideas for Future Enhancement
 
   * Display score for serach results
   * Specify a filter for tiddlers to be included in the index.
   * Custom stemmers for non-English/mixed language wikis
   * Automatically index in the background upon startup
 
-! Source Code
+# Source Code
 
 If you want to help out, you can check out the source for this plugin (or its dependency, the progress bar plugin) on GitHub:
 
