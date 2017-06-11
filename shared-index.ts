@@ -15,8 +15,6 @@ module SharedIndex {
 
     let index;
 
-    var initialized = false;
-
     async function delay(millis : number) {
         return new Promise(resolve => {
             setTimeout(resolve, millis);
