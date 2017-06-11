@@ -2,6 +2,7 @@ TSC=tsc
 TSCFLAGS=--pretty --lib ES2015,dom --module commonjs --alwaysStrict --noEmitOnError
 
 JS_FILES=$(shell ls *.ts | perl -npe 's/[.]ts$$/.js/')
+TID_FILES=$(shell ls *.tid)
 
 all: fts.html
 
