@@ -93,5 +93,30 @@ tags: [[$:/tags/test-spec]]
                 expect(results).toContain('NoModified');
             });
         });
+
+        it("should pick up on renames after initial index", function() {
+            var finished = false;
+
+            runs(function() {
+                widget.asyncInvokeAction().then(function() {
+                    $tw.wiki.renameTiddler('NoModified', 'BrandNewName');
+                    $tw.utils.nextTick(function() {
+                        finished = true;
+                    });
+                }, function(err) {
+                    // XXX signal to jasmine that we failed?
+                    console.error(err);
+                });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                var results = wiki.compileFilter('[ftsearch[modification]]')();
+                expect(results).toContain('BrandNewName');
+            });
+        });
     });
 })();
