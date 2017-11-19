@@ -84,7 +84,7 @@ module FTSCache {
     return cacheData;
   }
 
-  export function save(age, data) {
+  export async function save(age, data) {
     if(!hasFunctionalCache()) {
       return;
     }
@@ -92,7 +92,7 @@ module FTSCache {
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var dataPromise = localForage.setItem(dataKey, data);
     var metaPromise = localForage.setItem(metaKey, { age: age });
-    return Promise.all([ dataPromise, metaPromise ]);
+    await Promise.all([ dataPromise, metaPromise ]);
   }
 }
 
