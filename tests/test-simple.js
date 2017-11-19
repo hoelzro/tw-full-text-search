@@ -13,6 +13,7 @@ tags: [[$:/tags/test-spec]]
     }
 
     beforeEach(function() {
+        require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
         wiki.addTiddler({
             title: 'NoModified',
             text: 'No modification date'

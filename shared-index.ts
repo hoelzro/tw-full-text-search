@@ -62,6 +62,17 @@ module SharedIndex {
         return index;
     };
 
+    export function clearIndex() {
+        index = lunr(function() {
+            // XXX configurable boost? configurable fields?
+            this.field('title', {boost: 10})
+            this.field('tags', {boost: 5});
+            this.field('text');
+
+            this.ref('title');
+        });
+    }
+
     export function load(data) {
         index = lunr.Index.load(data);
     }
