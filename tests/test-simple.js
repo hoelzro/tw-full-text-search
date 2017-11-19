@@ -5,12 +5,7 @@ tags: [[$:/tags/test-spec]]
 
 \*/
 (function() {
-    var wiki = new $tw.Wiki();
-    wiki.addTiddler($tw.wiki.getTiddler('$:/plugins/hoelzro/progress-bar'));
-    wiki.addTiddler($tw.wiki.getTiddler('$:/plugins/hoelzro/full-text-search'));
-    wiki.readPluginInfo();
-    wiki.registerPluginTiddlers('plugin');
-    wiki.unpackPluginTiddlers();
+    var wiki = $tw.wiki;
 
     wiki.addTiddler({
         title: 'NoModified',
