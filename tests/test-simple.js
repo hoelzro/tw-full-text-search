@@ -5,7 +5,44 @@ tags: [[$:/tags/test-spec]]
 
 \*/
 (function() {
+    var localforage = require('localforage');
     var wiki = $tw.wiki;
+
+    var nullDriver = {
+        _driver: 'nullDriver',
+        _initStorage: function(options) {
+            return Promise.resolve();
+        },
+        clear: function(callback) {
+            callback();
+        },
+        getItem: function(key, callback) {
+            callback(null);
+        },
+        iterate: function(iterator, callback) {
+            callback();
+        },
+        key: function(n, callback) {
+            callback(n);
+        },
+        keys: function(callback) {
+            callback([]);
+        },
+        length: function(callback) {
+            callback(0);
+        },
+        removeItem: function(key, callback) {
+            callback();
+        },
+        setItem: function(key, value, callback) {
+            callback(null);
+        },
+        dropInstance: function(options, callback) {
+            callback();
+        }
+    };
+
+    var nullDriverReady;
 
     var initialTitles = Object.create(null);
     for(var title of wiki.compileFilter('[!is[system]]')()) {
@@ -17,6 +54,17 @@ tags: [[$:/tags/test-spec]]
         wiki.addTiddler({
             title: 'NoModified',
             text: 'No modification date'
+        });
+
+        nullDriverReady = false;
+        localforage.defineDriver(nullDriver, function() {
+            localforage.setDriver('nullDriver', function() {
+                nullDriverReady = true;
+            }, function(err) {
+                throw err;
+            });
+        }, function(err) {
+            throw err;
         });
     });
 
@@ -68,7 +116,7 @@ tags: [[$:/tags/test-spec]]
                 });
 
                 waitsFor(function() {
-                    return finished;
+                    return nullDriverReady && finished;
                 });
 
                 runs(function() {
@@ -126,7 +174,6 @@ tags: [[$:/tags/test-spec]]
     });
 
     describe('Cache tests', function() {
-        var localforage = require('localforage');
         var fauxStorage = Object.create(null);
 
         var inMemoryDriver = {
@@ -164,40 +211,6 @@ tags: [[$:/tags/test-spec]]
                 var oldValue = fauxStorage[key];
                 fauxStorage[key] = value;
                 callback(oldValue);
-            },
-            dropInstance: function(options, callback) {
-                callback();
-            }
-        };
-
-        var nullDriver = {
-            _driver: 'nullDriver',
-            _initStorage: function(options) {
-                return Promise.resolve();
-            },
-            clear: function(callback) {
-                callback();
-            },
-            getItem: function(key, callback) {
-                callback(null);
-            },
-            iterate: function(iterator, callback) {
-                callback();
-            },
-            key: function(n, callback) {
-                callback(n);
-            },
-            keys: function(callback) {
-                callback([]);
-            },
-            length: function(callback) {
-                callback(0);
-            },
-            removeItem: function(key, callback) {
-                callback();
-            },
-            setItem: function(key, value, callback) {
-                callback(null);
             },
             dropInstance: function(options, callback) {
                 callback();
