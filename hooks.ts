@@ -5,7 +5,6 @@ module-type: startup
 
 \*/
 
-declare var require;
 declare var $tw;
 
 module SaveTiddlerHook {
