@@ -90,8 +90,9 @@ module FTSCache {
     }
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
-    localForage.setItem(dataKey, data);
-    localForage.setItem(metaKey, { age: age });
+    var dataPromise = localForage.setItem(dataKey, data);
+    var metaPromise = localForage.setItem(metaKey, { age: age });
+    return Promise.all([ dataPromise, metaPromise ]);
   }
 }
 
