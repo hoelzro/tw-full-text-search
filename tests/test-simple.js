@@ -118,5 +118,30 @@ tags: [[$:/tags/test-spec]]
                 expect(results).toContain('BrandNewName');
             });
         });
+
+        it("should pick up on deletions after initial index", function() {
+            var finished = false;
+
+            runs(function() {
+                widget.asyncInvokeAction().then(function() {
+                    $tw.wiki.deleteTiddler('NoModified');
+                    $tw.utils.nextTick(function() {
+                        finished = true;
+                    });
+                }, function(err) {
+                    // XXX signal to jasmine that we failed?
+                    console.error(err);
+                });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                var results = wiki.compileFilter('[ftsearch[modification]]')();
+                expect(results).not.toContain('NoModified');
+            });
+        });
     });
 })();
