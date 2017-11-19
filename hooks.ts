@@ -11,13 +11,20 @@ module SaveTiddlerHook {
     export function startup() {
         var getIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js').getIndex;
 
-        $tw.hooks.addHook('th-saving-tiddler', function(tiddler) {
-            getIndex().update(tiddler.fields);
-            return tiddler;
-        });
+        $tw.wiki.addEventListener('change', function(changes) {
+            for(var title in changes) {
+                if($tw.wiki.isSystemTiddler(title)) {
+                    continue;
+                }
 
-        $tw.hooks.addHook('th-deleting-tiddler', function(tiddler) {
-            getIndex().remove({ title: tiddler.fields.title });
+                var change = changes[title];
+                if(change.modified) {
+                    var tiddler = $tw.wiki.getTiddler(title);
+                    getIndex().update(tiddler.fields);
+                } else { // change.deleted
+                    getIndex().remove({ title: title });
+                }
+            }
         });
     }
 }
