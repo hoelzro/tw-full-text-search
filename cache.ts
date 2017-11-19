@@ -14,7 +14,7 @@ var localForage : typeof LocalForageModule = require('$:/plugins/hoelzro/full-te
 
 module FTSCache {
   function hasFunctionalCache() {
-    if((typeof window) === 'undefined') { // happens when building
+    if($tw.browser) { // don't worry about it when building
       return false;
     }
 
