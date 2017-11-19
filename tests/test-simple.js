@@ -123,4 +123,97 @@ tags: [[$:/tags/test-spec]]
             });
         });
     });
+
+    describe('Cache tests', function() {
+        var localforage = require('localforage');
+        var fauxStorage = Object.create(null);
+
+        var inMemoryDriver = {
+            _driver: 'inMemoryDriver',
+            // XXX re-init between tests
+            _initStorage: function(options) {
+                return Promise.resolve();
+            },
+            clear: function(callback) {
+                fauxStorage = Object.create(null);
+                callback();
+            },
+            getItem: function(key, callback) {
+                callback(fauxStorage[key]);
+            },
+            iterate: function(iterator, callback) {
+                // XXX NYI
+                callback();
+            },
+            key: function(n, callback) {
+                // XXX NYI
+                callback(n);
+            },
+            keys: function(callback) {
+                callback(Object.keys(fauxStorage));
+            },
+            length: function(callback) {
+                callback(Object.keys(fauxStorage).length);
+            },
+            removeItem: function(key, callback) {
+                delete fauxStorage[key];
+                callback();
+            },
+            setItem: function(key, value, callback) {
+                var oldValue = fauxStorage[key];
+                fauxStorage[key] = value;
+                callback(oldValue);
+            },
+            dropInstance: function(options, callback) {
+                callback();
+            }
+        };
+
+        var nullDriver = {
+            _driver: 'nullDriver',
+            _initStorage: function(options) {
+                return Promise.resolve();
+            },
+            clear: function(callback) {
+                callback();
+            },
+            getItem: function(key, callback) {
+                callback(null);
+            },
+            iterate: function(iterator, callback) {
+                callback();
+            },
+            key: function(n, callback) {
+                callback(n);
+            },
+            keys: function(callback) {
+                callback([]);
+            },
+            length: function(callback) {
+                callback(0);
+            },
+            removeItem: function(key, callback) {
+                callback();
+            },
+            setItem: function(key, value, callback) {
+                callback(null);
+            },
+            dropInstance: function(options, callback) {
+                callback();
+            }
+        };
+
+        var inMemoryDriverReady = false;
+
+        // XXX how do I remove this driver after this test to make sure it doesn't interfere?
+        localforage.defineDriver(inMemoryDriver, function() {
+            localforage.setDriver('inMemoryDriver', function() {
+                inMemoryDriverReady = true;
+            }, function(err) {
+                throw err;
+            });
+        }, function(err) {
+            throw err;
+        });
+    });
 })();
