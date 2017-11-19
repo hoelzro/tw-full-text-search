@@ -52,10 +52,10 @@ module SharedIndex {
                 continue;
             }
             index.update(tiddler.fields);
-            progressCallback(++i);
+            await progressCallback(++i);
             await delay(1);
         }
-        progressCallback(tiddlers.length);
+        await progressCallback(tiddlers.length);
     };
 
     export function getIndex() {

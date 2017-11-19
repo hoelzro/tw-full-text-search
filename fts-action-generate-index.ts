@@ -95,14 +95,19 @@ module FTSActionGenerateIndex {
 
                 var self = this;
                 var lastUpdate = 0;
-                sharedIndex.buildIndex(tiddlers, rebuilding, async function(progressCurrent) {
+                await sharedIndex.buildIndex(tiddlers, rebuilding, async function(progressCurrent) {
                     if((progressCurrent - lastUpdate) >= UPDATE_FREQUENCY) {
                         var stateTiddler = self.wiki.getTiddler(STATE_TIDDLER);
                         self.wiki.addTiddler(new $tw.Tiddler(stateTiddler, { progressCurrent: progressCurrent }, self.wiki.getModificationFields()));
                         lastUpdate = progressCurrent;
                     }
                     if(progressCurrent == tiddlers.length) {
-                        await cache.save(age, sharedIndex.getIndex().toJSON());
+                        try {
+                            await cache.save(age, sharedIndex.getIndex().toJSON());
+                        } catch(e) {
+                            // failure to save the cache isn't great, but it's tolerable, so ignore it
+                        }
+
                         var stateTiddler = self.wiki.getTiddler(STATE_TIDDLER);
                         self.wiki.addTiddler(new $tw.Tiddler(stateTiddler, { text: 'initialized', progressCurrent: progressCurrent }, self.wiki.getModificationFields()));
                     }
