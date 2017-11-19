@@ -7,9 +7,25 @@ tags: [[$:/tags/test-spec]]
 (function() {
     var wiki = $tw.wiki;
 
-    wiki.addTiddler({
-        title: 'NoModified',
-        text: 'No modification date'
+    var initialTitles = Object.create(null);
+    for(var title of wiki.compileFilter('[!is[system]]')()) {
+        initialTitles[title] = true;
+    }
+
+    beforeEach(function() {
+        wiki.addTiddler({
+            title: 'NoModified',
+            text: 'No modification date'
+        });
+    });
+
+    afterEach(function() {
+        var titles = wiki.compileFilter('[!is[system]]')();
+        for(var title of titles) {
+            if(! (title in initialTitles)) {
+                wiki.deleteTiddler(title);
+            }
+        }
     });
 
     describe('Simple test', function() {
