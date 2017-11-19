@@ -28,7 +28,7 @@ module SharedIndex {
         });
     }
 
-    export async function buildIndex(tiddlers, rebuilding, progressCallback) {
+    export async function buildIndex(wiki, tiddlers, rebuilding, progressCallback) {
         if(rebuilding || !index) {
             index = lunr(function() {
                 // XXX configurable boost? configurable fields?
@@ -42,7 +42,7 @@ module SharedIndex {
 
         let i = 0;
         for(let title of tiddlers) {
-            let tiddler = $tw.wiki.getTiddler(title);
+            let tiddler = wiki.getTiddler(title);
 
             if(tiddler === undefined) { // avoid drafts that were open when we started
                 continue;
