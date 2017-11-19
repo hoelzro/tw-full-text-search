@@ -28,6 +28,10 @@ module FTSCache {
   }
 
   async function getCacheMetadata() {
+    if(!hasFunctionalCache()) {
+      return;
+    }
+
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     // XXX how does TS handle the case where the cache item doesn't have the right keys?
     var cacheMeta = await localForage.getItem<CacheMeta>(metaKey);
@@ -40,6 +44,10 @@ module FTSCache {
 
   // XXX what about migrating between lunr versions? what about invalid data under the key?
   async function getCacheData() {
+    if(!hasFunctionalCache()) {
+      return;
+    }
+
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var cacheData = await localForage.getItem(dataKey);
 
@@ -77,6 +85,9 @@ module FTSCache {
   }
 
   export function save(age, data) {
+    if(!hasFunctionalCache()) {
+      return;
+    }
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     localForage.setItem(dataKey, data);
