@@ -5,8 +5,18 @@ module-type: widget
 
 \*/
 
-/// <reference path="TiddlyWiki/core/modules/widgets/widget.d.ts"/>
-import { widget as Widget } from '$:/core/modules/widgets/widget.js';
+declare module WidgetModule {
+    export class widget {
+      wiki: any;
+
+      initialise(parseTreeNode : any, options: any) : void;
+      computeAttributes() : any;
+      refreshChildren(changedTiddlers : any) : any;
+      getAttribute(name : string, defaultText? : string) : string;
+    }
+}
+var widgetModule : typeof WidgetModule = require('$:/core/modules/widgets/widget.js');
+var Widget = widgetModule.widget;
 
 declare var require;
 declare var $tw;
