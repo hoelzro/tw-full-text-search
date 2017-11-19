@@ -18,9 +18,7 @@ module FTSCache {
       return false;
     }
 
-    // XXX check to see if localForage is working
-
-    return true;
+    return localForage.driver() != null;
   }
 
   interface CacheMeta {
