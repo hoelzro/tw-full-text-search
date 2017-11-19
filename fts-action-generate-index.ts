@@ -118,7 +118,10 @@ module FTSActionGenerateIndex {
         }
 
         invokeAction(triggeringWidget, event) {
-            this.asyncInvokeAction();
+            this.asyncInvokeAction().then(function() {
+            }, function(err) {
+                console.log(err);
+            });
         }
     }
 
