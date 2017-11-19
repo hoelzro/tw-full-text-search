@@ -6,6 +6,45 @@ tags: [[$:/tags/test-spec]]
 \*/
 (function() {
     var wiki = $tw.wiki;
+    var widget; // XXX remove me soon
+
+    function waitForNextTick() {
+        return new Promise(function(resolve, reject) {
+            $tw.utils.nextTick(resolve);
+        });
+    }
+
+    function prepare() {
+        return new Promise(function(resolve, reject) {
+            var finished = false;
+
+            runs(function() {
+                widget.asyncInvokeAction().then(function() {
+                    var result = resolve();
+                    if(result instanceof Promise) {
+                        result.then(function() {
+                            // XXX multiple promise chain links, though?
+                            finished = true;
+                        }, function(err) {
+                            reject(err); // XXX will this work?
+                        });
+                    } else {
+                        finished = true;
+                    }
+                }, function(err) {
+                    reject(err);
+                });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                resolve();
+            });
+        });
+    }
 
     var initialTitles = Object.create(null);
     for(var title of wiki.compileFilter('[!is[system]]')()) {
@@ -34,27 +73,12 @@ tags: [[$:/tags/test-spec]]
         });
 
         var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
-        var widget = new FTSActionGenerateIndexWidget(null, {
+        widget = new FTSActionGenerateIndexWidget(null, {
             wiki: wiki
         });
 
         it('should find matching documents without a modified field', function() {
-            var finished = false;
-
-            runs(function() {
-                widget.asyncInvokeAction().then(function() {
-                    finished = true;
-                }, function(err) {
-                    // XXX signal to jasmine that we failed?
-                    console.error(err);
-                });
-            });
-
-            waitsFor(function() {
-                return finished;
-            });
-
-            runs(function() {
+            prepare().then(function() {
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
                 var results = wiki.compileFilter('[ftsearch[modification]]')();
                 expect(results).toContain('NoModified');
@@ -62,30 +86,16 @@ tags: [[$:/tags/test-spec]]
         });
 
         it("should pick up changes to tiddlers' contents", function() {
-            var finished = false;
+            prepare().then(function() {
+                var tiddler = wiki.getTiddler('NoModified');
+                var newTiddler = new $tw.Tiddler(
+                    tiddler,
+                    {text: "New text without that word we're looking for"},
+                    wiki.getModificationFields());
+                wiki.addTiddler(newTiddler);
 
-            runs(function() {
-                widget.asyncInvokeAction().then(function() {
-                    var tiddler = wiki.getTiddler('NoModified');
-                    var newTiddler = new $tw.Tiddler(
-                        tiddler,
-                        {text: "New text without that word we're looking for"},
-                        wiki.getModificationFields());
-                    wiki.addTiddler(newTiddler);
-                    $tw.utils.nextTick(function() {
-                        finished = true;
-                    });
-                }, function(err) {
-                    // XXX signal to jasmine that we failed?
-                    console.error(err);
-                });
-            });
-
-            waitsFor(function() {
-                return finished;
-            });
-
-            runs(function() {
+                return waitForNextTick();
+            }).then(function() {
                 var results = wiki.compileFilter('[ftsearch[modification]]')();
                 expect(results).not.toContain('NoModified');
 
@@ -95,50 +105,20 @@ tags: [[$:/tags/test-spec]]
         });
 
         it("should pick up on renames after initial index", function() {
-            var finished = false;
-
-            runs(function() {
-                widget.asyncInvokeAction().then(function() {
-                    $tw.wiki.renameTiddler('NoModified', 'BrandNewName');
-                    $tw.utils.nextTick(function() {
-                        finished = true;
-                    });
-                }, function(err) {
-                    // XXX signal to jasmine that we failed?
-                    console.error(err);
-                });
-            });
-
-            waitsFor(function() {
-                return finished;
-            });
-
-            runs(function() {
+            prepare().then(function() {
+                $tw.wiki.renameTiddler('NoModified', 'BrandNewName');
+                return waitForNextTick();
+            }).then(function() {
                 var results = wiki.compileFilter('[ftsearch[modification]]')();
                 expect(results).toContain('BrandNewName');
             });
         });
 
         it("should pick up on deletions after initial index", function() {
-            var finished = false;
-
-            runs(function() {
-                widget.asyncInvokeAction().then(function() {
-                    $tw.wiki.deleteTiddler('NoModified');
-                    $tw.utils.nextTick(function() {
-                        finished = true;
-                    });
-                }, function(err) {
-                    // XXX signal to jasmine that we failed?
-                    console.error(err);
-                });
-            });
-
-            waitsFor(function() {
-                return finished;
-            });
-
-            runs(function() {
+            prepare().then(function() {
+                $tw.wiki.deleteTiddler('NoModified');
+                return waitForNextTick();
+            }).then(function() {
                 var results = wiki.compileFilter('[ftsearch[modification]]')();
                 expect(results).not.toContain('NoModified');
             });
