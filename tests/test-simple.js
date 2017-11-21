@@ -89,7 +89,7 @@ tags: [[$:/tags/test-spec]]
         });
 
         var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
-        widget = new FTSActionGenerateIndexWidget(null, {
+        var widget = new FTSActionGenerateIndexWidget(null, {
             wiki: wiki
         });
 
