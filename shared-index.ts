@@ -51,12 +51,28 @@ module SharedIndex {
             if(!type.startsWith('text/')) {
                 continue;
             }
-            index.update(tiddler.fields);
+            updateTiddler(tiddler);
             await progressCallback(++i);
             await delay(1);
         }
         await progressCallback(tiddlers.length);
     };
+
+    export function updateTiddler(tiddler) {
+        var fields : any = {
+            title: tiddler.fields.title
+        };
+
+        if('text' in tiddler.fields) {
+            fields.text = tiddler.fields.text;
+        }
+
+        if('tags' in tiddler.fields) {
+            fields.tags = tiddler.fields.tags.join(' ');
+        }
+
+        index.update(fields);
+    }
 
     export function getIndex() {
         return index;

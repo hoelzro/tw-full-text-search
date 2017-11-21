@@ -9,6 +9,7 @@ declare var $tw;
 
 module SaveTiddlerHook {
     export function startup() {
+        var updateTiddler = require('$:/plugins/hoelzro/full-text-search/shared-index.js').updateTiddler;
         var getIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js').getIndex;
 
         $tw.wiki.addEventListener('change', function(changes) {
@@ -20,7 +21,7 @@ module SaveTiddlerHook {
                 var change = changes[title];
                 if(change.modified) {
                     var tiddler = $tw.wiki.getTiddler(title);
-                    getIndex().update(tiddler.fields);
+                    updateTiddler(tiddler);
                 } else { // change.deleted
                     getIndex().remove({ title: title });
                 }
