@@ -340,5 +340,54 @@ tags: [[$:/tags/test-spec]]
                 expect(results).not.toContain('JustSomeText');
             });
         });
+
+        it('should not pick up tiddlers deleted and re-added between a save and cache load', function() {
+            function deleteTiddler() {
+                return new Promise(function(resolve, reject) {
+                    wiki.deleteTiddler('JustSomeText');
+                    $tw.utils.nextTick(function() {
+                        resolve();
+                    });
+                });
+            }
+
+            function readdTiddler() {
+                var tiddler = $tw.wiki.getTiddler('JustSomeText');
+
+                return new Promise(function(resolve, reject) {
+                    var newTiddler = new $tw.Tiddler(
+                        tiddler,
+                        {text: "New text without that word we're looking for"},
+                        wiki.getModificationFields());
+                    wiki.addTiddler(newTiddler);
+
+                    $tw.utils.nextTick(function() {
+                        resolve();
+                    });
+                });
+            }
+
+            var finished = false;
+
+            runs(function() {
+                setupInMemoryDriver().then(
+                localforage.clear).then(
+                buildIndex).then(
+                clearIndex).then(
+                deleteTiddler).then(
+                readdTiddler).then(
+                buildIndex).then(
+                function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                var results = wiki.compileFilter('[ftsearch[modification]]')();
+                expect(results).not.toContain('JustSomeText');
+            });
+        });
     });
 })();
