@@ -50,11 +50,17 @@ tags: [[$:/tags/test-spec]]
     }
 
     beforeEach(function() {
+        // XXX clear localforage in memory cache?
         require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
         wiki.addTiddler({
             title: 'NoModified',
             text: 'No modification date'
         });
+
+        wiki.addTiddler(new $tw.Tiddler(
+            wiki.getCreationFields(),
+            { title: 'JustSomeText', text: 'This one has a modification date' },
+            wiki.getModificationFields()));
 
         nullDriverReady = false;
         localforage.defineDriver(nullDriver, function() {
@@ -226,17 +232,74 @@ tags: [[$:/tags/test-spec]]
             }
         };
 
-        var inMemoryDriverReady = false;
-
-        // XXX how do I remove this driver after this test to make sure it doesn't interfere?
-        localforage.defineDriver(inMemoryDriver, function() {
-            localforage.setDriver('inMemoryDriver', function() {
-                inMemoryDriverReady = true;
-            }, function(err) {
-                throw err;
+        function setupInMemoryDriver() {
+            return new Promise(function(resolve, reject) {
+                // XXX how do I remove this driver after this test to make sure it doesn't interfere?
+                localforage.defineDriver(inMemoryDriver, function() {
+                    localforage.setDriver('inMemoryDriver', function() {
+                        resolve();
+                    }, function(err) {
+                        reject(err);
+                    });
+                }, function(err) {
+                    reject(err);
+                });
             });
-        }, function(err) {
-            throw err;
+        }
+
+        function buildIndex() {
+            return new Promise(function(resolve, reject) {
+                var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
+                var widget = new FTSActionGenerateIndexWidget(null, {
+                    wiki: wiki
+                });
+                widget.asyncInvokeAction().then(function() {
+                    resolve();
+                });
+            });
+        }
+
+        function freshBuildIndex() {
+            require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
+            return buildIndex();
+        }
+
+        it('should work with the cache', function() {
+            function modifyTiddler() {
+                var tiddler = $tw.wiki.getTiddler('JustSomeText');
+
+                return new Promise(function(resolve, reject) {
+                    var newTiddler = new $tw.Tiddler(
+                        tiddler,
+                        {text: "New text without that word we're looking for"},
+                        wiki.getModificationFields());
+                    wiki.addTiddler(newTiddler);
+
+                    $tw.utils.nextTick(function() {
+                        resolve();
+                    });
+                });
+            }
+
+            var finished = false;
+
+            runs(function() {
+                setupInMemoryDriver().then(
+                localforage.clear).then(
+                buildIndex).then(
+                modifyTiddler).then(
+                freshBuildIndex).then(
+                function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                var results = wiki.compileFilter('[ftsearch[modification]]')();
+                expect(results).not.toContain('JustSomeText');
+            });
         });
     });
 })();
