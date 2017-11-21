@@ -5,7 +5,7 @@ tags: [[$:/tags/test-spec]]
 
 \*/
 (function() {
-    var localforage = require('localforage');
+    var localforage = require('$:/plugins/hoelzro/full-text-search/localforage.min.js');
     var wiki = $tw.wiki;
 
     var nullDriver = {
