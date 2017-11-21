@@ -14,31 +14,31 @@ tags: [[$:/tags/test-spec]]
             return Promise.resolve();
         },
         clear: function(callback) {
-            callback();
+            return callback ? callback() : Promise.resolve();
         },
         getItem: function(key, callback) {
-            callback(null);
+            return callback ? callback() : Promise.resolve(null);
         },
         iterate: function(iterator, callback) {
-            callback();
+            return callback ? callback() : Promise.resolve();
         },
         key: function(n, callback) {
-            callback(n);
+            return callback ? callback(n) : Promise.resolve(n);
         },
         keys: function(callback) {
-            callback([]);
+            return callback ? callback([]) : Promise.resolve([]);
         },
         length: function(callback) {
-            callback(0);
+            return callback ? callback(0) : Promise.resolve(0);
         },
         removeItem: function(key, callback) {
-            callback();
+            return callback ? callback() : Promise.resolve();
         },
         setItem: function(key, value, callback) {
-            callback(null);
+            return callback ? callback(null) : Promise.resolve(null);
         },
         dropInstance: function(options, callback) {
-            callback();
+            return callback ? callback() : Promise.resolve();
         }
     };
 
@@ -184,36 +184,45 @@ tags: [[$:/tags/test-spec]]
             },
             clear: function(callback) {
                 fauxStorage = Object.create(null);
-                callback();
+                return callback ? callback() : Promise.resolve();
             },
             getItem: function(key, callback) {
-                callback(fauxStorage[key]);
+                var value = fauxStorage[key];
+                if(value != undefined) {
+                    value = JSON.parse(value);
+                } else {
+                    value = null;
+                }
+                return callback ? callback(value) : Promise.resolve(value);
             },
             iterate: function(iterator, callback) {
-                // XXX NYI
-                callback();
+                return callback ? callback() : Promise.resolve();
             },
             key: function(n, callback) {
-                // XXX NYI
-                callback(n);
+                return callback ? callback(n) : Promise.resolve(n);
             },
             keys: function(callback) {
-                callback(Object.keys(fauxStorage));
+                return callback ? callback(Object.keys(fauxStorage)) : Promise.resolve(Object.keys(fauxStorage));
             },
             length: function(callback) {
-                callback(Object.keys(fauxStorage).length);
+                return callback ? callback(Object.keys(fauxStorage).length) : Promise.resolve(Object.keys(fauxStorage).length);
             },
             removeItem: function(key, callback) {
                 delete fauxStorage[key];
-                callback();
+                return callback ? callback() : Promise.resolve();
             },
             setItem: function(key, value, callback) {
                 var oldValue = fauxStorage[key];
-                fauxStorage[key] = value;
-                callback(oldValue);
+                if(oldValue != undefined) {
+                    oldValue = JSON.parse(oldValue);
+                } else {
+                    oldValue = null;
+                }
+                fauxStorage[key] = JSON.stringify(value);
+                return callback ? callback(oldValue) : Promise.resolve(oldValue);
             },
             dropInstance: function(options, callback) {
-                callback();
+                return callback ? callback() : Promise.resolve();
             }
         };
 
