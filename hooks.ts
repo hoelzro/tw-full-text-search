@@ -21,7 +21,9 @@ module SaveTiddlerHook {
                 var change = changes[title];
                 if(change.modified) {
                     var tiddler = $tw.wiki.getTiddler(title);
-                    updateTiddler(tiddler);
+                    if(tiddler !== undefined) {
+                        updateTiddler(tiddler);
+                    }
                 } else { // change.deleted
                     getIndex().remove({ title: title });
                 }
