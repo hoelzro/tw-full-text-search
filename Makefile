@@ -1,5 +1,6 @@
 TSC=tsc
-TSCFLAGS=--pretty --lib esnext,dom --module commonjs --alwaysStrict --noEmitOnError
+TSCFLAGS=--pretty --module commonjs --alwaysStrict --noEmitOnError
+TSCLIBS=--lib esnext,dom
 
 JS_FILES=$(shell ls *.ts | perl -npe 's/[.]ts$$/.js/')
 TID_FILES=$(shell ls *.tid)
@@ -32,4 +33,7 @@ realclean: clean
 	rm -rf .build-wiki/
 
 %.js: %.ts
-	$(TSC) $(TSCFLAGS) $^
+	$(TSC) $(TSCFLAGS) $(TSCLIBS) $^
+
+index-worker.js: index-worker.ts
+	$(TSC) $(TSCFLAGS) --lib esnext,webworker $^
