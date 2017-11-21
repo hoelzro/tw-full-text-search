@@ -65,6 +65,9 @@ module FTSActionGenerateIndex {
                 for(let i = titles.length - 1; i >= 0; i--) {
                     var title = titles[i];
                     var tiddler = this.wiki.getTiddler(title);
+                    if(!('modified' in tiddler.fields)) {
+                        break;
+                    }
                     let modified = $tw.utils.stringifyDate(tiddler.fields.modified);
                     if(modified < cacheAge) {
                         break;
