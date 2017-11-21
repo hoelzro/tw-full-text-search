@@ -54,6 +54,7 @@ module FTSActionGenerateIndex {
             var rebuilding = this.getAttribute('rebuild') === 'true';
             var filter = '[!is[system]]';
             var tiddlers;
+            var isFresh;
 
             var cacheData = rebuilding ? null : await cache.load();
             if(cacheData) {
@@ -83,8 +84,10 @@ module FTSActionGenerateIndex {
                     tiddlers.push(title);
                 }
                 sharedIndex.load(cacheData);
+                isFresh = false;
             } else {
                 tiddlers = this.wiki.compileFilter(filter)();
+                isFresh = true;
             }
             var age = this.wiki.compileFilter(filter + ' +[nsort[modified]last[]get[modified]]')()[0];
             age = age == null ? '0' : age;
@@ -99,7 +102,7 @@ module FTSActionGenerateIndex {
 
                 var self = this;
                 var lastUpdate = 0;
-                await sharedIndex.buildIndex(this.wiki, tiddlers, rebuilding, async function(progressCurrent) {
+                await sharedIndex.buildIndex(this.wiki, tiddlers, isFresh, async function(progressCurrent) {
                     if((progressCurrent - lastUpdate) >= UPDATE_FREQUENCY) {
                         var stateTiddler = self.wiki.getTiddler(STATE_TIDDLER);
                         self.wiki.addTiddler(new $tw.Tiddler(stateTiddler, { progressCurrent: progressCurrent }, self.wiki.getModificationFields()));

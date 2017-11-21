@@ -58,7 +58,7 @@ module SharedIndex {
         await progressCallback(tiddlers.length);
     }
 
-    async function buildIndexWorker(wiki, tiddlers, rebuilding, progressCallback) {
+    async function buildIndexWorker(wiki, tiddlers, progressCallback) {
         var lunrSource = wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/lunr.min.js');
         var workerSource = wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/index-worker.js');
         var worker = new Worker(URL.createObjectURL(new Blob([ workerSource ])));
@@ -94,11 +94,11 @@ module SharedIndex {
         await progressCallback(tiddlers.length);
     }
 
-    export async function buildIndex(wiki, tiddlers, rebuilding, progressCallback) {
-        if($tw.browser) {
-            return buildIndexWorker(wiki, tiddlers, rebuilding, progressCallback);
+    export async function buildIndex(wiki, tiddlers, isFresh, progressCallback) {
+        if($tw.browser && isFresh) {
+            return buildIndexWorker(wiki, tiddlers, progressCallback);
         } else {
-            return buildIndexIncremental(wiki, tiddlers, rebuilding, progressCallback);
+            return buildIndexIncremental(wiki, tiddlers, isFresh, progressCallback);
         }
     }
 
