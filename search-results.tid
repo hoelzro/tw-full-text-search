@@ -16,7 +16,16 @@ caption: Full Text Results
 <<searchResults>>
 </$reveal>
 
-<$reveal type="nomatch" state=<<state>> text="initialized">
-Search index not initialized; please initialize it in the [[Control Panel|$:/ControlPanel]].
+<$reveal type="match" state=<<state>> text="uninitialized">
+Search index not initialized; please <$button>
+  Click here to generate the index
+  <$fts-action-generate-index />
+</$button>
+
+</$reveal>
+<$reveal type="match" state=<<state>> text="initializing">
+Generating index...
+
+<$hoelzro-progressbar current={{$:/temp/FTS-state!!progressCurrent}} total={{$:/temp/FTS-state!!progressTotal}} />
 </$reveal>
 </$set>
