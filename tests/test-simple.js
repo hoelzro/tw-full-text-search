@@ -200,6 +200,21 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(results).toContain('Reason');
             });
         });
+
+        it('should pick up "twitter" in a URL', function() {
+            prepare().then(function() {
+                var text = 'https://twitter.com/hoelzro/status/877901644125663232';
+                $tw.wiki.addTiddler(new $tw.Tiddler(
+                    $tw.wiki.getCreationFields(),
+                    { title: 'ContainsTweetLink', type: 'text/vnd.tiddlywiki', text: text },
+                    $tw.wiki.getModificationFields()
+                ));
+                return waitForNextTick();
+            }).then(function() {
+                var results = wiki.compileFilter('[ftsearch[twitter]]')();
+                expect(results).toContain('ContainsTweetLink');
+            });
+        });
     });
 
     describe('Cache tests', function() {
