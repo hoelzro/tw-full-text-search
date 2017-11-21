@@ -59,8 +59,8 @@ module SharedIndex {
     }
 
     async function buildIndexWorker(wiki, tiddlers, rebuilding, progressCallback) {
-        var lunrSource = $tw.wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/lunr.min.js');
-        var workerSource = $tw.wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/index-worker.js');
+        var lunrSource = wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+        var workerSource = wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/index-worker.js');
         var worker = new Worker(URL.createObjectURL(new Blob([ workerSource ])));
         worker.postMessage(URL.createObjectURL(new Blob([ lunrSource ])));
 
