@@ -87,6 +87,7 @@ module FTSActionGenerateIndex {
                 tiddlers = this.wiki.compileFilter(filter)();
             }
             var age = this.wiki.compileFilter(filter + ' +[nsort[modified]last[]get[modified]]')()[0];
+            age = age == null ? '0' : age;
             var stateTiddler = this.wiki.getTiddler(STATE_TIDDLER);
             if(tiddlers.length > 0) {
                 var fields = {
