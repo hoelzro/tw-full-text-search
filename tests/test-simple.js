@@ -261,9 +261,15 @@ tags: [[$:/tags/test-spec]]
             });
         }
 
+        function clearIndex() {
+            return new Promise(function(resolve, reject) {
+                require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
+                resolve();
+            });
+        }
+
         function freshBuildIndex() {
-            require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
-            return buildIndex();
+            return clearIndex().then(buildIndex);
         }
 
         it('should work with the cache', function() {
@@ -291,6 +297,37 @@ tags: [[$:/tags/test-spec]]
                 buildIndex).then(
                 modifyTiddler).then(
                 freshBuildIndex).then(
+                function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                var results = wiki.compileFilter('[ftsearch[modification]]')();
+                expect(results).not.toContain('JustSomeText');
+            });
+        });
+
+        it('should not pick up tiddlers deleted between a save and cache load', function() {
+            function deleteTiddler() {
+                return new Promise(function(resolve, reject) {
+                    wiki.deleteTiddler('JustSomeText');
+                    $tw.utils.nextTick(function() {
+                        resolve();
+                    });
+                });
+            }
+            var finished = false;
+
+            runs(function() {
+                setupInMemoryDriver().then(
+                localforage.clear).then(
+                buildIndex).then(
+                clearIndex).then(
+                deleteTiddler).then(
+                buildIndex).then(
                 function() { finished = true });
             });
 
