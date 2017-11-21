@@ -49,7 +49,7 @@ module FTSCache {
       return null;
     }
 
-    return cacheData;
+    return JSON.parse(cacheData as string);
   }
 
   export async function getAge() {
@@ -84,7 +84,7 @@ module FTSCache {
     }
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
-    var dataPromise = localForage.setItem(dataKey, data);
+    var dataPromise = localForage.setItem(dataKey, JSON.stringify(data));
     var metaPromise = localForage.setItem(metaKey, { age: age });
     await Promise.all([ dataPromise, metaPromise ]);
   }
