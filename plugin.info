@@ -2,7 +2,7 @@
     "title": "$:/plugins/hoelzro/full-text-search",
     "description": "Full text search",
     "author": "hoelzro",
-    "version": "0.0.4",
+    "version": "0.0.5",
     "core-version": ">=5.1.14",
     "source": "https://github.com/hoelzro/tw-full-text-search",
     "plugin-type": "plugin",
