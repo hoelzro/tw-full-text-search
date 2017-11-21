@@ -75,6 +75,7 @@ tags: [[$:/tags/test-spec]]
     });
 
     afterEach(function() {
+        // XXX this causes a bunch of events that are handled async =(
         var titles = wiki.compileFilter('[!is[system]]')();
         for(var title of titles) {
             if(! (title in initialTitles)) {
@@ -103,6 +104,7 @@ tags: [[$:/tags/test-spec]]
             return new Promise(function(resolve, reject) {
                 var finished = false;
 
+                // XXX wait for nullDriverReady first
                 runs(function() {
                     widget.asyncInvokeAction().then(function() {
                         var result = resolve();
