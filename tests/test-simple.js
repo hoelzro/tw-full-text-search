@@ -179,6 +179,27 @@ tags: [[$:/tags/test-spec]]
                 expect(results).not.toContain('NoModified');
             });
         });
+
+        it('should pick reason with "reason programming language"', function() {
+            prepare().then(function() {
+                var text = `
+A kind of OCaml that compiles down to JavaScript
+
+https://facebook.github.io/reason/
+
+https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
+                `;
+                $tw.wiki.addTiddler(new $tw.Tiddler(
+                    $tw.wiki.getCreationFields(),
+                    { title: 'Reason', tags: 'Someday/Maybe Play Coding [[Programming Languages]]', type: 'text/vnd.tiddlywiki', text: text },
+                    $tw.wiki.getModificationFields()
+                ));
+                return waitForNextTick();
+            }).then(function() {
+                var results = wiki.compileFilter('[ftsearch[reason programming language]]')();
+                expect(results).toContain('Reason');
+            });
+        });
     });
 
     describe('Cache tests', function() {
