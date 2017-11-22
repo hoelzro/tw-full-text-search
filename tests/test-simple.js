@@ -476,5 +476,38 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(results).not.toContain('JustSomeText');
             });
         });
+
+        it("should invalidate the index if the config tiddler is changed", function() {
+            function setupRelatedTerms() {
+                wiki.addTiddler(new $tw.Tiddler(
+                    wiki.getCreationFields(),
+                    {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: '["modification change"]', type: 'application/json'},
+                    wiki.getModificationFields(),
+                ));
+
+                return waitForNextTick();
+            }
+
+            function clearRelatedTerms() {
+                wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
+
+                return waitForNextTick();
+            }
+
+            var finished = false;
+            runs(function() {
+                setupRelatedTerms().then(
+                buildIndex).then(
+                clearRelatedTerms).then(function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
+            });
+        });
     });
 })();
