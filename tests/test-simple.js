@@ -509,5 +509,45 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
             });
         });
+
+        it('should rebuild the whole index if the config tiddler is changed and loaded from cache', function() {
+            function setupRelatedTerms() {
+                wiki.addTiddler(new $tw.Tiddler(
+                    wiki.getCreationFields(),
+                    {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: '["modification change"]', type: 'application/json'},
+                    wiki.getModificationFields(),
+                ));
+
+                return waitForNextTick();
+            }
+
+            function clearRelatedTerms() {
+                wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
+
+                return waitForNextTick();
+            }
+
+            var finished = false;
+            runs(function() {
+                setupInMemoryDriver().then(
+                localforage.clear).then(
+                setupRelatedTerms).then(
+                buildIndex).then(
+                clearRelatedTerms).then(
+                clearIndex).then(
+                buildIndex).then(function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+                var results = wiki.compileFilter('[ftsearch[change]]')();
+                expect(results).not.toContain('NoModified');
+                expect(results).not.toContain('JustSomeText');
+            });
+        });
     });
 })();
