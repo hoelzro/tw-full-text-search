@@ -42,6 +42,50 @@ tags: [[$:/tags/test-spec]]
         }
     };
 
+    function waitForNextTick() {
+        return new Promise(function(resolve, reject) {
+            $tw.utils.nextTick(resolve);
+        });
+    }
+
+    function prepare() {
+        return new Promise(function(resolve, reject) {
+            var finished = false;
+
+            // XXX wait for nullDriverReady first
+            runs(function() {
+                var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
+                var widget = new FTSActionGenerateIndexWidget(null, {
+                    wiki: wiki
+                });
+
+                widget.asyncInvokeAction().then(function() {
+                    var result = resolve();
+                    if(result instanceof Promise) {
+                        result.then(function() {
+                            // XXX multiple promise chain links, though?
+                            finished = true;
+                        }, function(err) {
+                            reject(err); // XXX will this work?
+                        });
+                    } else {
+                        finished = true;
+                    }
+                }, function(err) {
+                    reject(err);
+                });
+            });
+
+            waitsFor(function() {
+                return nullDriverReady && finished;
+            });
+
+            runs(function() {
+                resolve();
+            });
+        });
+    }
+
     var nullDriverReady;
 
     var initialTitles = Object.create(null);
@@ -88,50 +132,6 @@ tags: [[$:/tags/test-spec]]
         it('should start with an uninitialized FTS state', function() {
             expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
         });
-
-        var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
-        var widget = new FTSActionGenerateIndexWidget(null, {
-            wiki: wiki
-        });
-
-        function waitForNextTick() {
-            return new Promise(function(resolve, reject) {
-                $tw.utils.nextTick(resolve);
-            });
-        }
-
-        function prepare() {
-            return new Promise(function(resolve, reject) {
-                var finished = false;
-
-                // XXX wait for nullDriverReady first
-                runs(function() {
-                    widget.asyncInvokeAction().then(function() {
-                        var result = resolve();
-                        if(result instanceof Promise) {
-                            result.then(function() {
-                                // XXX multiple promise chain links, though?
-                                finished = true;
-                            }, function(err) {
-                                reject(err); // XXX will this work?
-                            });
-                        } else {
-                            finished = true;
-                        }
-                    }, function(err) {
-                        reject(err);
-                    });
-                });
-
-                waitsFor(function() {
-                    return nullDriverReady && finished;
-                });
-
-                runs(function() {
-                    resolve();
-                });
-            });
-        }
 
         it('should find matching documents without a modified field', function() {
             prepare().then(function() {
