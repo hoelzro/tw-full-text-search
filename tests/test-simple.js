@@ -48,6 +48,18 @@ tags: [[$:/tags/test-spec]]
         });
     }
 
+    function buildIndex() {
+        return new Promise(function(resolve, reject) {
+            var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
+            var widget = new FTSActionGenerateIndexWidget(null, {
+                wiki: wiki
+            });
+            widget.asyncInvokeAction().then(function() {
+                resolve();
+            });
+        });
+    }
+
     function prepare() {
         return new Promise(function(resolve, reject) {
             var finished = false;
@@ -281,18 +293,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                     });
                 }, function(err) {
                     reject(err);
-                });
-            });
-        }
-
-        function buildIndex() {
-            return new Promise(function(resolve, reject) {
-                var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
-                var widget = new FTSActionGenerateIndexWidget(null, {
-                    wiki: wiki
-                });
-                widget.asyncInvokeAction().then(function() {
-                    resolve();
                 });
             });
         }
