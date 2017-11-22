@@ -13,6 +13,7 @@ module SaveTiddlerHook {
 
     export function startup() {
         var { updateTiddler, getIndex, clearIndex } = require('$:/plugins/hoelzro/full-text-search/shared-index.js');
+        let cache = require('$:/plugins/hoelzro/full-text-search/cache.js');
 
         $tw.wiki.addEventListener('change', function(changes) {
             let index = getIndex();
@@ -28,6 +29,7 @@ module SaveTiddlerHook {
                         stateTiddler,
                         { text: 'uninitialized' },
                        $tw.wiki.getModificationFields()));
+                    cache.invalidate();
                 }
 
                 if($tw.wiki.isSystemTiddler(title)) {

@@ -88,6 +88,14 @@ module FTSCache {
     var metaPromise = localForage.setItem(metaKey, { age: age });
     await Promise.all([ dataPromise, metaPromise ]);
   }
+
+  export async function invalidate() {
+    var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
+    var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
+    var dataPromise = localForage.removeItem(dataKey);
+    var metaPromise = localForage.removeItem(metaKey);
+    await Promise.all([ dataPromise, metaPromise ]);
+  }
 }
 
 export = FTSCache;
