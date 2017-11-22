@@ -17,6 +17,9 @@ module FTSearch {
         });
 
         var index = getIndex();
+        if(!index) {
+            return [];
+        }
         var results = index.search(operator.operand);
 
         return results.filter(function(match) {

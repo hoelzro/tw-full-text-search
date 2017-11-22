@@ -13,6 +13,11 @@ module SaveTiddlerHook {
         var getIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js').getIndex;
 
         $tw.wiki.addEventListener('change', function(changes) {
+            let index = getIndex();
+            if(!index) {
+                return;
+            }
+
             for(var title in changes) {
                 if($tw.wiki.isSystemTiddler(title)) {
                     continue;
