@@ -47,7 +47,8 @@ module QueryExpander {
 
     function getTreeTop() {
         return $tw.wiki.getCacheForTiddler(RELATED_TERMS_TIDDLER, 'related-terms-tree', function() {
-            let relatedTerms = [ [ 'modification', 'change' ] ];
+            let relatedTerms = $tw.wiki.getTiddlerDataCached(RELATED_TERMS_TIDDLER, []);
+            relatedTerms = relatedTerms.map($tw.utils.parseStringArray);
 
             return buildAliasTree(relatedTerms);
         });
