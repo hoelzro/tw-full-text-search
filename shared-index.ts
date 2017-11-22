@@ -22,15 +22,28 @@ module SharedIndex {
     }
 
     async function buildIndexIncremental(wiki, tiddlers, rebuilding, progressCallback) {
+        let builder = null;
         if(rebuilding || !index) {
-            index = lunr(function() {
-                // XXX configurable boost? configurable fields?
-                this.field('title', {boost: 10})
-                this.field('tags', {boost: 5});
-                this.field('text');
+            builder = new lunr.MutableBuilder();
 
-                this.ref('title');
-            });
+            builder.pipeline.add(
+              lunr.trimmer,
+              lunr.stopWordFilter,
+              lunr.stemmer
+            );
+
+            builder.searchPipeline.add(
+              lunr.stemmer
+            );
+
+            // XXX configurable fields?
+            builder.field('title');
+            builder.field('tags');
+            builder.field('text');
+
+            builder.ref('title');
+        } else {
+            builder = index.builder;
         }
 
         let i = 0;
@@ -44,10 +57,11 @@ module SharedIndex {
             if(!type.startsWith('text/')) {
                 continue;
             }
-            updateTiddler(tiddler);
+            updateTiddler(builder, tiddler);
             await progressCallback(++i);
             await delay(1);
         }
+        index = builder.build();
         await progressCallback(tiddlers.length);
     }
 
@@ -61,7 +75,7 @@ module SharedIndex {
             worker.onmessage = function(msg) {
                 // XXX OW OW OW OW OW
                 if(typeof(msg.data) == 'string') {
-                    index = lunr.Index.load(JSON.parse(msg.data));
+                    index = lunr.MutableIndex.load(JSON.parse(msg.data));
                     resolve();
                 } else {
                     progressCallback(msg.data);
@@ -95,7 +109,7 @@ module SharedIndex {
         }
     }
 
-    export function updateTiddler(tiddler) {
+    export function updateTiddler(builder, tiddler) {
         var fields : any = {
             title: tiddler.fields.title
         };
@@ -108,7 +122,8 @@ module SharedIndex {
             fields.tags = tiddler.fields.tags.join(' ');
         }
 
-        index.update(fields);
+        builder.remove(fields);
+        builder.add(fields);
     }
 
     export function getIndex() {
@@ -116,18 +131,11 @@ module SharedIndex {
     };
 
     export function clearIndex() {
-        index = lunr(function() {
-            // XXX configurable boost? configurable fields?
-            this.field('title', {boost: 10})
-            this.field('tags', {boost: 5});
-            this.field('text');
-
-            this.ref('title');
-        });
+        index = null;
     }
 
     export function load(data) {
-        index = lunr.Index.load(data);
+        index = lunr.MutableIndex.load(data);
     }
 }
 export = SharedIndex;

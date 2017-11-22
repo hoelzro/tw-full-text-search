@@ -5,25 +5,45 @@ module-type: library
 
 \*/
 
+declare module lunr {
+    export class MutableBuilder {
+        pipeline : any;
+        searchPipeline : any;
+        field : any;
+        ref : any;
+        add : any;
+        build : any;
+    }
+}
+
 (function() {
     onmessage = function(msg) {
         importScripts(msg.data);
 
-        // XXX duplication sucks
-        let index = lunr(function() {
-            // XXX configurable boost? configurable fields?
-            this.field('title', {boost: 10})
-            this.field('tags', {boost: 5});
-            this.field('text');
+        let builder = new lunr.MutableBuilder();
 
-            this.ref('title');
-        });
+        builder.pipeline.add(
+          lunr.trimmer,
+          lunr.stopWordFilter,
+          lunr.stemmer
+        );
+
+        builder.searchPipeline.add(
+          lunr.stemmer
+        );
+
+        // XXX configurable fields?
+        builder.field('title');
+        builder.field('tags');
+        builder.field('text');
+
+        builder.ref('title');
 
         let count = 0;
         let previousUpdate = new Date();
         onmessage = function(msg) {
             if(msg.data == '') {
-                postMessage(JSON.stringify(index));
+                postMessage(JSON.stringify(builder.build()));
                 close();
             } else {
                 var tiddlerFields = JSON.parse(msg.data);
@@ -40,7 +60,7 @@ module-type: library
                     fields.tags = tiddlerFields.tags.join(' ');
                 }
 
-                index.update(fields);
+                builder.add(fields);
                 count++;
                 let now = new Date();
                 if((now.getTime() - previousUpdate.getTime()) > 200) {

@@ -9,8 +9,7 @@ declare var $tw;
 
 module SaveTiddlerHook {
     export function startup() {
-        var updateTiddler = require('$:/plugins/hoelzro/full-text-search/shared-index.js').updateTiddler;
-        var getIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js').getIndex;
+        var { updateTiddler, getIndex } = require('$:/plugins/hoelzro/full-text-search/shared-index.js');
 
         $tw.wiki.addEventListener('change', function(changes) {
             let index = getIndex();
@@ -27,10 +26,10 @@ module SaveTiddlerHook {
                 if(change.modified) {
                     var tiddler = $tw.wiki.getTiddler(title);
                     if(tiddler !== undefined) {
-                        updateTiddler(tiddler);
+                        updateTiddler(index, tiddler);
                     }
                 } else { // change.deleted
-                    getIndex().remove({ title: title });
+                    index.remove({ title: title });
                 }
             }
         });
