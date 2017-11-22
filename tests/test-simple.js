@@ -66,12 +66,7 @@ tags: [[$:/tags/test-spec]]
 
             // XXX wait for nullDriverReady first
             runs(function() {
-                var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
-                var widget = new FTSActionGenerateIndexWidget(null, {
-                    wiki: wiki
-                });
-
-                widget.asyncInvokeAction().then(function() {
+                buildIndex().then(function() {
                     var result = resolve();
                     if(result instanceof Promise) {
                         result.then(function() {
