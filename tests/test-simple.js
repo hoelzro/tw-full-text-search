@@ -93,6 +93,80 @@ tags: [[$:/tags/test-spec]]
         });
     }
 
+    var fauxStorage = Object.create(null);
+
+    var inMemoryDriver = {
+        _driver: 'inMemoryDriver',
+        // XXX re-init between tests
+        _initStorage: function(options) {
+            return Promise.resolve();
+        },
+        clear: function(callback) {
+            fauxStorage = Object.create(null);
+            return callback ? callback() : Promise.resolve();
+        },
+        getItem: function(key, callback) {
+            var value = fauxStorage[key];
+            if(value != undefined) {
+                value = JSON.parse(value);
+            } else {
+                value = null;
+            }
+            return callback ? callback(value) : Promise.resolve(value);
+        },
+        iterate: function(iterator, callback) {
+            return callback ? callback() : Promise.resolve();
+        },
+        key: function(n, callback) {
+            return callback ? callback(n) : Promise.resolve(n);
+        },
+        keys: function(callback) {
+            return callback ? callback(Object.keys(fauxStorage)) : Promise.resolve(Object.keys(fauxStorage));
+        },
+        length: function(callback) {
+            return callback ? callback(Object.keys(fauxStorage).length) : Promise.resolve(Object.keys(fauxStorage).length);
+        },
+        removeItem: function(key, callback) {
+            delete fauxStorage[key];
+            return callback ? callback() : Promise.resolve();
+        },
+        setItem: function(key, value, callback) {
+            var oldValue = fauxStorage[key];
+            if(oldValue != undefined) {
+                oldValue = JSON.parse(oldValue);
+            } else {
+                oldValue = null;
+            }
+            fauxStorage[key] = JSON.stringify(value);
+            return callback ? callback(oldValue) : Promise.resolve(oldValue);
+        },
+        dropInstance: function(options, callback) {
+            return callback ? callback() : Promise.resolve();
+        }
+    };
+
+    function setupInMemoryDriver() {
+        return new Promise(function(resolve, reject) {
+            // XXX how do I remove this driver after this test to make sure it doesn't interfere?
+            localforage.defineDriver(inMemoryDriver, function() {
+                localforage.setDriver('inMemoryDriver', function() {
+                    resolve();
+                }, function(err) {
+                    reject(err);
+                });
+            }, function(err) {
+                reject(err);
+            });
+        });
+    }
+
+    function clearIndex() {
+        return new Promise(function(resolve, reject) {
+            require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
+            resolve();
+        });
+    }
+
     var nullDriverReady;
 
     var initialTitles = Object.create(null);
@@ -225,80 +299,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
     });
 
     describe('Cache tests', function() {
-        var fauxStorage = Object.create(null);
-
-        var inMemoryDriver = {
-            _driver: 'inMemoryDriver',
-            // XXX re-init between tests
-            _initStorage: function(options) {
-                return Promise.resolve();
-            },
-            clear: function(callback) {
-                fauxStorage = Object.create(null);
-                return callback ? callback() : Promise.resolve();
-            },
-            getItem: function(key, callback) {
-                var value = fauxStorage[key];
-                if(value != undefined) {
-                    value = JSON.parse(value);
-                } else {
-                    value = null;
-                }
-                return callback ? callback(value) : Promise.resolve(value);
-            },
-            iterate: function(iterator, callback) {
-                return callback ? callback() : Promise.resolve();
-            },
-            key: function(n, callback) {
-                return callback ? callback(n) : Promise.resolve(n);
-            },
-            keys: function(callback) {
-                return callback ? callback(Object.keys(fauxStorage)) : Promise.resolve(Object.keys(fauxStorage));
-            },
-            length: function(callback) {
-                return callback ? callback(Object.keys(fauxStorage).length) : Promise.resolve(Object.keys(fauxStorage).length);
-            },
-            removeItem: function(key, callback) {
-                delete fauxStorage[key];
-                return callback ? callback() : Promise.resolve();
-            },
-            setItem: function(key, value, callback) {
-                var oldValue = fauxStorage[key];
-                if(oldValue != undefined) {
-                    oldValue = JSON.parse(oldValue);
-                } else {
-                    oldValue = null;
-                }
-                fauxStorage[key] = JSON.stringify(value);
-                return callback ? callback(oldValue) : Promise.resolve(oldValue);
-            },
-            dropInstance: function(options, callback) {
-                return callback ? callback() : Promise.resolve();
-            }
-        };
-
-        function setupInMemoryDriver() {
-            return new Promise(function(resolve, reject) {
-                // XXX how do I remove this driver after this test to make sure it doesn't interfere?
-                localforage.defineDriver(inMemoryDriver, function() {
-                    localforage.setDriver('inMemoryDriver', function() {
-                        resolve();
-                    }, function(err) {
-                        reject(err);
-                    });
-                }, function(err) {
-                    reject(err);
-                });
-            });
-        }
-
-        function clearIndex() {
-            return new Promise(function(resolve, reject) {
-                require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
-                resolve();
-            });
-        }
-
         function freshBuildIndex() {
             return clearIndex().then(buildIndex);
         }
