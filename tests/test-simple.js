@@ -424,11 +424,56 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
 
     describe('Query expansion tests', function() {
         it('should expand change to modification', function() {
-            prepare().then(function() {
+            function setupRelatedTerms() {
+                wiki.addTiddler(new $tw.Tiddler(
+                    wiki.getCreationFields(),
+                    {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: '["modification change"]', type: 'application/json'},
+                    wiki.getModificationFields(),
+                ));
+
+                return waitForNextTick();
+            }
+
+            var finished = false;
+            runs(function() {
+                setupRelatedTerms().then(
+                buildIndex).then(function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
                 var results = wiki.compileFilter('[ftsearch[change]]')();
                 expect(results).toContain('NoModified');
                 expect(results).toContain('JustSomeText');
+            });
+        });
+
+        it("shouldn't expand anything if the config tiddler has no data", function() {
+            function clearRelatedTerms() {
+                wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
+
+                return waitForNextTick();
+            }
+
+            var finished = false;
+            runs(function() {
+                clearRelatedTerms().then(
+                buildIndex).then(function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+                var results = wiki.compileFilter('[ftsearch[change]]')();
+                expect(results).not.toContain('NoModified');
+                expect(results).not.toContain('JustSomeText');
             });
         });
     });
