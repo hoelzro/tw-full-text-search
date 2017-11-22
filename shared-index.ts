@@ -22,6 +22,8 @@ module SharedIndex {
     }
 
     async function buildIndexIncremental(wiki, tiddlers, rebuilding, progressCallback) {
+        let { expandQuery } = require('$:/plugins/hoelzro/full-text-search/query-expander.js');
+
         let builder = null;
         if(rebuilding || !index) {
             builder = new lunr.MutableBuilder();
@@ -29,6 +31,7 @@ module SharedIndex {
             builder.pipeline.add(
               lunr.trimmer,
               lunr.stopWordFilter,
+              expandQuery,
               lunr.stemmer
             );
 
