@@ -70,7 +70,7 @@ module FTSActionGenerateIndex {
                         break;
                     }
                     let modified = $tw.utils.stringifyDate(tiddler.fields.modified);
-                    if(modified < cacheAge) {
+                    if(modified <= cacheAge) {
                         break;
                     }
                     tiddlers.push(title);
