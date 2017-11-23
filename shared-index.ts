@@ -14,6 +14,8 @@ module SharedIndex {
     const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
     var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
 
+    lunr.utils.warn = function() {};
+
     let index = null;
 
     async function delay(millis : number) {
