@@ -11,6 +11,7 @@ declare var setTimeout;
 declare var setInterval;
 
 module SharedIndex {
+    const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
     var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
 
     let index = null;
@@ -22,10 +23,15 @@ module SharedIndex {
     }
 
     async function buildIndexIncremental(wiki, tiddlers, rebuilding, progressCallback) {
-        let { expandQuery } = require('$:/plugins/hoelzro/full-text-search/query-expander.js');
+        let { generateQueryExpander } = require('$:/plugins/hoelzro/full-text-search/query-expander.js');
 
         let builder = null;
         if(rebuilding || !index) {
+            let relatedTerms = $tw.wiki.getTiddlerDataCached(RELATED_TERMS_TIDDLER, []);
+            relatedTerms = relatedTerms.map($tw.utils.parseStringArray);
+
+            let expandQuery = generateQueryExpander(lunr, relatedTerms);
+
             builder = new lunr.MutableBuilder();
 
             builder.pipeline.add(

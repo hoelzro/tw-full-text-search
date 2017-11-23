@@ -6,13 +6,8 @@ module-type: library
 \*/
 
 
-declare var $tw;
-
 module QueryExpander {
-    const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
-    let lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
-
-    function buildAliasTree(listOfAliases) {
+    function buildAliasTree(lunr, listOfAliases) {
         let topTree = [];
 
         for(let aliases of listOfAliases) {
@@ -45,44 +40,39 @@ module QueryExpander {
         return topTree;
     }
 
-    function getTreeTop() {
-        return $tw.wiki.getCacheForTiddler(RELATED_TERMS_TIDDLER, 'related-terms-tree', function() {
-            let relatedTerms = $tw.wiki.getTiddlerDataCached(RELATED_TERMS_TIDDLER, []);
-            relatedTerms = relatedTerms.map($tw.utils.parseStringArray);
+    export function generateQueryExpander(lunr, relatedTerms) {
+        let treeTop = buildAliasTree(lunr, relatedTerms);
+        let currentTree = treeTop;
 
-            return buildAliasTree(relatedTerms);
-        });
-    }
-
-    let currentTree;
-
-    export function expandQuery(token) {
-        if(token.metadata.index == 0) {
-            currentTree = getTreeTop();
-        }
-
-        let tokenStr = token.toString();
-        if(currentTree.hasOwnProperty(tokenStr)) {
-            currentTree = currentTree[tokenStr];
-            if(currentTree.length > 0) {
-                let originalToken = token;
-                let tokens = [ originalToken ];
-
-                for(let token of currentTree) {
-                    tokens.push(originalToken.clone(function(str, meta) {
-                        return token;
-                    }));
-                }
-
-                return tokens;
+        let expandQuery = function expandQuery(token) {
+            if(token.metadata.index == 0) {
+                currentTree = treeTop;
             }
-        } else {
-            currentTree = getTreeTop();
-        }
-        return token;
-    }
 
-    lunr.Pipeline.registerFunction(expandQuery, 'expandQuery');
+            let tokenStr = token.toString();
+            if(currentTree.hasOwnProperty(tokenStr)) {
+                currentTree = currentTree[tokenStr];
+                if(currentTree.length > 0) {
+                    let originalToken = token;
+                    let tokens = [ originalToken ];
+
+                    for(let token of currentTree) {
+                        tokens.push(originalToken.clone(function(str, meta) {
+                            return token;
+                        }));
+                    }
+
+                    return tokens;
+                }
+            } else {
+                currentTree = treeTop;
+            }
+            return token;
+        };
+
+        lunr.Pipeline.registerFunction(expandQuery, 'expandQuery');
+        return expandQuery;
+    }
 }
 
 export = QueryExpander;
