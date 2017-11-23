@@ -90,6 +90,9 @@ module FTSCache {
   }
 
   export async function invalidate() {
+    if(!hasFunctionalCache()) {
+      return;
+    }
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var dataPromise = localForage.removeItem(dataKey);
