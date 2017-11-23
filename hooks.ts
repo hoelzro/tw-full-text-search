@@ -17,9 +17,6 @@ module SaveTiddlerHook {
 
         $tw.wiki.addEventListener('change', function(changes) {
             let index = getIndex();
-            if(!index) {
-                return;
-            }
 
             for(var title in changes) {
                 if(title == RELATED_TERMS_TIDDLER) {
@@ -30,6 +27,10 @@ module SaveTiddlerHook {
                         { text: 'uninitialized' },
                        $tw.wiki.getModificationFields()));
                     cache.invalidate();
+                }
+
+                if(!index) {
+                    continue;
                 }
 
                 if($tw.wiki.isSystemTiddler(title)) {
