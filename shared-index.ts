@@ -77,35 +77,39 @@ module SharedIndex {
     }
 
     async function buildIndexWorker(wiki, tiddlers, progressCallback) {
-        var lunrSource = wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/lunr.min.js');
         var workerSource = wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/index-worker.js');
         var worker = new Worker(URL.createObjectURL(new Blob([ workerSource ])));
-        worker.postMessage(URL.createObjectURL(new Blob([ lunrSource ])));
 
         var workerFinished = new Promise(function(resolve, reject) {
             worker.onmessage = function(msg) {
-                // XXX OW OW OW OW OW
-                if(typeof(msg.data) == 'string') {
-                    index = lunr.MutableIndex.load(JSON.parse(msg.data));
+                let payload = msg.data;
+
+                if(payload.type == 'require') {
+                    let moduleName = payload.name;
+                    let moduleSource = wiki.getTiddlerText(moduleName);
+
+                    worker.postMessage(URL.createObjectURL(new Blob( [ moduleSource ])));
+                } else if(payload.type == 'index') {
+                    index = lunr.MutableIndex.load(JSON.parse(payload.index));
                     resolve();
-                } else {
-                    progressCallback(msg.data);
+                } else if(payload.type == 'sendTiddlers') {
+                    for(let title of tiddlers) {
+                        let tiddler = wiki.getTiddler(title);
+
+                        if(tiddler === undefined) { // avoid drafts that were open when we started
+                            continue;
+                        }
+                        var type = tiddler.fields.type || 'text/vnd.tiddlywiki';
+                        if(!type.startsWith('text/')) {
+                            continue;
+                        }
+                        worker.postMessage(JSON.stringify(tiddler.fields));
+                    }
+                    worker.postMessage(null);
+                } else if(payload.type == 'progress') {
+                    progressCallback(payload.count);
                 }
             };
-
-            for(let title of tiddlers) {
-                let tiddler = wiki.getTiddler(title);
-
-                if(tiddler === undefined) { // avoid drafts that were open when we started
-                    continue;
-                }
-                var type = tiddler.fields.type || 'text/vnd.tiddlywiki';
-                if(!type.startsWith('text/')) {
-                    continue;
-                }
-                worker.postMessage(JSON.stringify(tiddler.fields));
-            }
-            worker.postMessage('');
         });
 
         await workerFinished;
