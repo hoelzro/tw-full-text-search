@@ -11,12 +11,12 @@ module-type: library
             onmessage = function(msg) {
                 onmessage = function() {};
 
-                resolve(msg as any);
+                resolve(msg.data);
             };
         });
     }
 
-    async function requireFromPage(name) {
+    async function requireFromPage(name) : Promise<any> {
         postMessage({
             type: 'require',
             name: name,
@@ -26,7 +26,7 @@ module-type: library
             let mod = { exports: {} };
             self['module'] = mod;
             self['exports'] = mod.exports;
-            importScripts(msg.data);
+            importScripts(msg);
             delete self['module'];
             delete self['exports'];
 
@@ -39,8 +39,8 @@ module-type: library
 
         let msg = await getNextMessage();
 
-        while(msg.data != null) {
-            yield JSON.parse(msg.data);
+        while(msg != null) {
+            yield JSON.parse(msg);
             msg = await getNextMessage();
         }
     }
