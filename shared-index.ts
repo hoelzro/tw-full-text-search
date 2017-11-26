@@ -13,6 +13,8 @@ declare var setInterval;
 module SharedIndex {
     const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
     var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+    // XXX import?
+    let { generateQueryExpander } = require('$:/plugins/hoelzro/full-text-search/query-expander.js');
 
     lunr.utils.warn = function() {};
 
@@ -25,8 +27,6 @@ module SharedIndex {
     }
 
     async function buildIndexIncremental(wiki, tiddlers, rebuilding, progressCallback) {
-        let { generateQueryExpander } = require('$:/plugins/hoelzro/full-text-search/query-expander.js');
-
         let builder = null;
         if(rebuilding || !index) {
             let relatedTerms = $tw.wiki.getTiddlerDataCached(RELATED_TERMS_TIDDLER, []);
@@ -80,6 +80,11 @@ module SharedIndex {
         var workerSource = wiki.getTiddlerText('$:/plugins/hoelzro/full-text-search/index-worker.js');
         var worker = new Worker(URL.createObjectURL(new Blob([ workerSource ])));
 
+        // XXX this needs to happen - not great how "action at a distance"y this is
+        let relatedTerms = $tw.wiki.getTiddlerDataCached(RELATED_TERMS_TIDDLER, []);
+        relatedTerms = relatedTerms.map($tw.utils.parseStringArray);
+        let expandQuery = generateQueryExpander(lunr, relatedTerms);
+
         var workerFinished = new Promise(function(resolve, reject) {
             worker.onmessage = function(msg) {
                 let payload = msg.data;
@@ -108,6 +113,8 @@ module SharedIndex {
                     worker.postMessage(null);
                 } else if(payload.type == 'progress') {
                     progressCallback(payload.count);
+                } else if(payload.type == 'getRelatedTerms') {
+                    worker.postMessage(relatedTerms);
                 }
             };
         });

@@ -34,6 +34,14 @@ module-type: library
         });
     }
 
+    async function getRelatedTerms() {
+        postMessage({
+            type: 'getRelatedTerms'
+        });
+
+        return await getNextMessage();
+    }
+
     async function* readTiddlers() {
         postMessage({ type: 'sendTiddlers' });
 
@@ -46,12 +54,17 @@ module-type: library
     }
 
     let lunr : any = await requireFromPage('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+    let { generateQueryExpander } = await requireFromPage('$:/plugins/hoelzro/full-text-search/query-expander.js');
+    let relatedTerms = await getRelatedTerms();
+
+    let expandQuery = generateQueryExpander(lunr, relatedTerms);
 
     let builder = new lunr.MutableBuilder();
 
     builder.pipeline.add(
       lunr.trimmer,
       lunr.stopWordFilter,
+      expandQuery,
       lunr.stemmer
     );
 
