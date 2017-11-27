@@ -10,7 +10,7 @@ module QueryExpander {
     (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
 
     function buildAliasTree(lunr, listOfAliases) {
-        let topTree = [];
+        let topTree : any = {};
 
         for(let aliases of listOfAliases) {
             for(let i = 0; i < aliases.length; i++) {
@@ -28,12 +28,15 @@ module QueryExpander {
 
                     for(let token of jTokens) {
                         if(! (token in tree)) {
-                            tree[token] = [];
+                            tree[token] = {};
                         }
                         tree = tree[token];
                     }
+                    if(! ('.expansion' in tree)) {
+                        tree['.expansion'] = [];
+                    }
                     for(let token of iTokens) {
-                        tree.push(token);
+                        tree['.expansion'].push(token);
                     }
                 }
             }
@@ -54,11 +57,11 @@ module QueryExpander {
             let tokenStr = token.toString();
             if(currentTree.hasOwnProperty(tokenStr)) {
                 currentTree = currentTree[tokenStr];
-                if(currentTree.length > 0) {
+                if('.expansion' in currentTree) {
                     let originalToken = token;
                     let tokens = [ originalToken ];
 
-                    for(let token of currentTree) {
+                    for(let token of currentTree['.expansion']) {
                         tokens.push(originalToken.clone(function(str, meta) {
                             return token;
                         }));
