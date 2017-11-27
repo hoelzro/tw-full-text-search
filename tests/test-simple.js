@@ -549,5 +549,41 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(results).not.toContain('JustSomeText');
             });
         });
+
+        it('should not break the indexer to use Related terms with a number as a member', function() {
+            function setupRelatedTerms() {
+                let relatedTermList = [
+                    "foobar [[foo 2]]"
+                ];
+
+                wiki.addTiddler(new $tw.Tiddler(
+                    wiki.getCreationFields(),
+                    {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: JSON.stringify(relatedTermList), type: 'application/json'},
+                    wiki.getModificationFields(),
+                ));
+
+                wiki.addTiddler(new $tw.Tiddler(
+                    wiki.getCreationFields(),
+                    {title: 'Empty', text: 'foo', type: 'text/vnd.tiddlywiki', tags: ''},
+                    wiki.getModificationFields(),
+                ));
+
+                return waitForNextTick();
+            }
+
+            var finished = false;
+            runs(function() {
+                setupRelatedTerms().then(
+                buildIndex).then(function() { finished = true });
+            });
+
+            waitsFor(function() {
+                return finished;
+            });
+
+            runs(function() {
+                expect(true).toBe(true);
+            });
+        });
     });
 })();
