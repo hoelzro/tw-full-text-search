@@ -40,6 +40,10 @@ module SaveTiddlerHook {
                 var change = changes[title];
                 if(change.modified) {
                     var tiddler = $tw.wiki.getTiddler(title);
+                    let type = tiddler.fields.type || 'text/vnd.tiddlywiki';
+                    if(!type.startsWith('text/')) {
+                        continue;
+                    }
                     if(tiddler !== undefined) {
                         updateTiddler(index, tiddler);
                     }
