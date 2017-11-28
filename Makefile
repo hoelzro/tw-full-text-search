@@ -3,17 +3,17 @@ TSCFLAGS=--pretty --module commonjs --alwaysStrict --noEmitOnError
 TSCLIBS=--lib esnext,dom
 
 JS_FILES=$(shell ls *.ts | perl -npe 's/[.]ts$$/.js/')
-TID_FILES=$(shell ls *.tid)
+TID_FILES=$(shell ls *.tid | fgrep -v fts.json.tid)
 TEST_FILES=$(shell ls tests/*.js)
 
-all: fts.html
+all: fts.html fts.json.tid
 
 # XXX not running tests here would be great, if I could make a "make test"
 fts.html: .build-wiki $(JS_FILES) $(TID_FILES) $(TEST_FILES) plugin.info
 	mkdir -p .build-wiki/plugins/full-text-search
 	mkdir -p .build-wiki/tiddlers/tests
 	cp *.js .build-wiki/plugins/full-text-search
-	cp *.tid .build-wiki/plugins/full-text-search
+	cp $(TID_FILES) .build-wiki/plugins/full-text-search
 	cp *.info .build-wiki/plugins/full-text-search
 	cp -R files/ .build-wiki/plugins/full-text-search
 	cp -R tests/ .build-wiki/tiddlers/tests/
@@ -33,7 +33,7 @@ fts.json.tid: fts.html
 	git clone https://github.com/hoelzro/tw-progress-bar .build-wiki/plugins/progress-bar
 
 clean:
-	rm -f $(JS_FILES) fts.html
+	rm -f $(JS_FILES) fts.html fts.json.tid
 
 realclean: clean
 	rm -rf .build-wiki/
