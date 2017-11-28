@@ -7,7 +7,9 @@ module-type: library
 
 
 module QueryExpander {
-    (Symbol as any).asyncIterator = Symbol.asyncIterator || Symbol.for("Symbol.asyncIterator");
+    if(! ('asyncIterator' in Symbol)) {
+        (Symbol as any).asyncIterator = Symbol.for('Symbol.asyncIterator');
+    }
 
     function buildAliasTree(lunr, listOfAliases) {
         let topTree : any = {};
