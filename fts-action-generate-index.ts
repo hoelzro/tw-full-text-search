@@ -28,7 +28,10 @@ var sharedIndex : typeof SharedIndex = require('$:/plugins/hoelzro/full-text-sea
 import * as Cache from './cache';
 var cache : typeof Cache = require('$:/plugins/hoelzro/full-text-search/cache.js');
 
+let { generateQueryExpander } = require('$:/plugins/hoelzro/full-text-search/query-expander.js');
+
 module FTSActionGenerateIndex {
+    const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
     const STATE_TIDDLER    = '$:/temp/FTS-state';
     const UPDATE_FREQUENCY = 10;
 
@@ -83,6 +86,12 @@ module FTSActionGenerateIndex {
                     }
                     tiddlers.push(title);
                 }
+                let relatedTerms = $tw.wiki.getTiddlerDataCached(RELATED_TERMS_TIDDLER, []);
+                relatedTerms = relatedTerms.map($tw.utils.parseStringArray);
+
+                let lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+                let expandQuery = generateQueryExpander(lunr, relatedTerms);
+
                 sharedIndex.load(cacheData);
                 isFresh = false;
             } else {
