@@ -300,6 +300,21 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(results).toContain('ContainsTweetLink');
             });
         });
+
+        it('should not pick up a non-text tiddler on an update', function() {
+            prepare().then(function() {
+                var newTiddler = new $tw.Tiddler(
+                    wiki.getCreationFields(),
+                    {type: 'application/x-tiddler-data', text: 'foo bar', title: 'MyDataTiddler'},
+                    wiki.getModificationFields());
+                wiki.addTiddler(newTiddler);
+
+                return waitForNextTick();
+            }).then(function() {
+                var results = wiki.compileFilter('[ftsearch[foo]]')();
+                expect(results).not.toContain('MyDataTiddler');
+            });
+        });
     });
 
     describe('Cache tests', function() {
