@@ -197,6 +197,10 @@ tags: [[$:/tags/test-spec]]
         }, function(err) {
             throw err;
         });
+
+        let lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+
+        delete lunr.Pipeline.registeredFunctions.expandQuery;
     });
 
     afterEach(function() {
@@ -300,6 +304,8 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
 
     describe('Cache tests', function() {
         function freshBuildIndex() {
+            let lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+            delete lunr.Pipeline.registeredFunctions.expandQuery;
             return clearIndex().then(buildIndex);
         }
 
