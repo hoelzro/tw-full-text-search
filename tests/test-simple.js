@@ -286,7 +286,7 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             });
         });
 
-        it('should pick up "twitter" in a URL', function() {
+        xit('should pick up "twitter" in a URL', function() {
             prepare().then(function() {
                 var text = 'https://twitter.com/hoelzro/status/877901644125663232';
                 $tw.wiki.addTiddler(new $tw.Tiddler(
