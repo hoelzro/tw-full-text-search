@@ -60,6 +60,7 @@ module SharedIndex {
         let i = 0;
         for(let title of tiddlers) {
             let tiddler = wiki.getTiddler(title);
+            i++;
 
             if(tiddler === undefined) { // avoid drafts that were open when we started
                 continue;
@@ -69,7 +70,7 @@ module SharedIndex {
                 continue;
             }
             updateTiddler(builder, tiddler);
-            await progressCallback(++i);
+            await progressCallback(i);
             await delay(1);
         }
         index = builder.build();
