@@ -19,6 +19,12 @@ module FTSCache {
 
   interface CacheMeta {
     age: number;
+    ftsPluginVersion: string;
+  }
+
+  function currentPluginVersion() {
+    let pluginTiddler = $tw.wiki.getTiddler('$:/plugins/hoelzro/full-text-search');
+    return pluginTiddler.fields.version;
   }
 
   async function getCacheMetadata() {
@@ -33,6 +39,10 @@ module FTSCache {
       return;
     }
 
+    if(!('ftsPluginVersion' in cacheMeta) || cacheMeta.ftsPluginVersion != currentPluginVersion()) {
+      return;
+    }
+
     return cacheMeta;
   }
 
@@ -40,6 +50,12 @@ module FTSCache {
   async function getCacheData() {
     if(!hasFunctionalCache()) {
       return;
+    }
+
+    let metaData = await getCacheMetadata();
+
+    if(metaData == null) {
+      return null;
     }
 
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
@@ -85,7 +101,7 @@ module FTSCache {
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var dataPromise = localForage.setItem(dataKey, JSON.stringify(data));
-    var metaPromise = localForage.setItem(metaKey, { age: age });
+    var metaPromise = localForage.setItem(metaKey, { age: age, ftsPluginVersion: currentPluginVersion() });
     await Promise.all([ dataPromise, metaPromise ]);
   }
 
