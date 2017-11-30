@@ -3,6 +3,20 @@ type: text/vnd.tiddlywiki
 
 ! Release History
 
+!! 1.0.0 (2017-11-29)
+
+!!! User-facing changes
+
+  * Enabled index creation using web workers, resulting in a 10x speedup
+  * Fixed a bug causing images and other non-text data to get indexed
+  * Fixed a bug causing tags to be improperly indexed
+
+!!! Developer changes
+
+  * Upgraded the FTS plugin to lunr.js 2.1.4, plus some modifications of my own to enable mutable indexes
+  * Added tests
+  * Added an experimental feature called "query expansion" - I don't know if it'll stay around or how well it works, so there's no UI around it at the moment
+
 !! 0.0.4 (2017-06-11)
 
 Fix bug where deleted content from a tiddler would still affect search results if a
