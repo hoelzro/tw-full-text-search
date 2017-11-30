@@ -13,6 +13,8 @@ import * as LocalForageModule from 'localforage';
 var localForage : typeof LocalForageModule = require('$:/plugins/hoelzro/full-text-search/localforage.min.js');
 
 module FTSCache {
+  const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
+
   function hasFunctionalCache() {
     return localForage.driver() != null;
   }
@@ -20,11 +22,20 @@ module FTSCache {
   interface CacheMeta {
     age: number;
     ftsPluginVersion: string;
+    relatedTermsModified: number;
   }
 
   function currentPluginVersion() {
     let pluginTiddler = $tw.wiki.getTiddler('$:/plugins/hoelzro/full-text-search');
     return pluginTiddler.fields.version;
+  }
+
+  function relatedTermsModified() {
+    let relatedTerms = $tw.wiki.getTiddler(RELATED_TERMS_TIDDLER);
+    if(!relatedTerms || !relatedTerms.fields.modified) {
+      return 0;
+    }
+    return relatedTerms.fields.modified.getTime();
   }
 
   async function getCacheMetadata() {
@@ -40,6 +51,14 @@ module FTSCache {
     }
 
     if(!('ftsPluginVersion' in cacheMeta) || cacheMeta.ftsPluginVersion != currentPluginVersion()) {
+      return;
+    }
+
+    let cacheRelatedTermsModified = ('relatedTermsModified' in cacheMeta) ? cacheMeta.relatedTermsModified : 0;
+    let relatedTerms = $tw.wiki.getTiddler(RELATED_TERMS_TIDDLER);
+    let ourRelatedTermsModified = relatedTermsModified();
+
+    if(cacheRelatedTermsModified != ourRelatedTermsModified) {
       return;
     }
 
@@ -101,7 +120,7 @@ module FTSCache {
     var dataKey = 'tw-fts-index.data.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var metaKey = 'tw-fts-index.meta.' + $tw.wiki.getTiddler('$:/SiteTitle').fields.text;
     var dataPromise = localForage.setItem(dataKey, JSON.stringify(data));
-    var metaPromise = localForage.setItem(metaKey, { age: age, ftsPluginVersion: currentPluginVersion() });
+    var metaPromise = localForage.setItem(metaKey, { age: age, ftsPluginVersion: currentPluginVersion(), relatedTermsModified: relatedTermsModified() });
     await Promise.all([ dataPromise, metaPromise ]);
   }
 
