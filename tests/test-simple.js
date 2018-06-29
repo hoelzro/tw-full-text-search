@@ -315,6 +315,19 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(results).not.toContain('MyDataTiddler');
             });
         });
+
+        it('should not fail upon an incomplete query', function() {
+            prepare().then(function() {
+                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+                try {
+                    var results = wiki.compileFilter('[ftsearch[date~]]')();
+                    expect(results.length).toBe(0);
+                } catch(e) {
+                    console.log(e);
+                    expect(true).toBe(false);
+                }
+            });
+        });
     });
 
     describe('Cache tests', function() {
