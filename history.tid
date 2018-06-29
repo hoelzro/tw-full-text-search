@@ -3,6 +3,12 @@ type: text/vnd.tiddlywiki
 
 ! Release History
 
+!! 1.0.1 (2018-06-29)
+
+!!! Bug Fixes
+
+  * Fixed a bug where incomplete lunr.js queries would throw red boxes in the user's face.  Thanks to Diego Mesa for reporting!
+
 !! 1.0.0 (2017-11-29)
 
 !!! User-facing changes
