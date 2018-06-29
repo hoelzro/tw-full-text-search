@@ -8,6 +8,7 @@ module-type: filteroperator
 declare var require;
 
 module FTSearch {
+    var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
     var getIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js').getIndex;
 
     export function ftsearch(source, operator, options) {
@@ -20,13 +21,21 @@ module FTSearch {
         if(!index) {
             return [];
         }
-        var results = index.search(operator.operand);
+        try {
+            var results = index.search(operator.operand);
 
-        return results.filter(function(match) {
-            return sourceLookup.hasOwnProperty(match.ref);
-        }).map(function(match) {
-            return match.ref;
-        });
+            return results.filter(function(match) {
+                return sourceLookup.hasOwnProperty(match.ref);
+            }).map(function(match) {
+                return match.ref;
+            });
+        } catch(e) {
+            if(e instanceof lunr.QueryParseError) {
+                return [];
+            } else {
+                throw e;
+            }
+        }
     };
 }
 
