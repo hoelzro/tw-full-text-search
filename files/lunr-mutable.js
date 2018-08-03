@@ -1,6 +1,6 @@
 (function() {
 
-var lunr = require('lunr');
+var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
 /*
  * Copyright 2018 Rob Hoelz <rob AT hoelz.ro>
  *
