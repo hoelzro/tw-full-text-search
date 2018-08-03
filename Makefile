@@ -42,4 +42,4 @@ realclean: clean
 	$(TSC) $(TSCFLAGS) $(TSCLIBS) $^
 
 index-worker.js: index-worker.ts
-	$(TSC) $(TSCFLAGS) --lib esnext,webworker $^
+	$(TSC) $(TSCFLAGS) --lib esnext,webworker,webworker.importscripts $^
