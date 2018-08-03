@@ -54,12 +54,13 @@ module-type: library
     }
 
     let lunr : any = await requireFromPage('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+    let lunrMutable : any = await requireFromPage('$:/plugins/hoelzro/full-text-search/lunr-mutable.js');
     let { generateQueryExpander } = await requireFromPage('$:/plugins/hoelzro/full-text-search/query-expander.js');
     let relatedTerms = await getRelatedTerms();
 
     let expandQuery = generateQueryExpander(lunr, relatedTerms);
 
-    let builder = new lunr.MutableBuilder();
+    let builder = new lunrMutable.Builder();
 
     builder.pipeline.add(
       lunr.trimmer,

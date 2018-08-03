@@ -9,6 +9,14 @@
 			}
 		},
 		{
+			"file": "lunr-mutable.js",
+			"fields": {
+				"type": "application/javascript",
+				"title": "$:/plugins/hoelzro/full-text-search/lunr-mutable.js",
+				"module-type": "library"
+			}
+		},
+		{
 			"file": "localforage.min.js",
 			"fields": {
 				"type": "application/javascript",

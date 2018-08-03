@@ -12,7 +12,8 @@ declare var setInterval;
 
 module SharedIndex {
     const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
-    var lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+    let lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
+    let lunrMutable = require('$:/plugins/hoelzro/full-text-search/lunr-mutable.js');
     // XXX import?
     let { generateQueryExpander } = require('$:/plugins/hoelzro/full-text-search/query-expander.js');
 
@@ -34,7 +35,7 @@ module SharedIndex {
 
             let expandQuery = generateQueryExpander(lunr, relatedTerms);
 
-            builder = new lunr.MutableBuilder();
+            builder = new lunrMutable.Builder();
 
             builder.pipeline.add(
               lunr.trimmer,
@@ -96,7 +97,7 @@ module SharedIndex {
 
                     worker.postMessage(URL.createObjectURL(new Blob( [ moduleSource ])));
                 } else if(payload.type == 'index') {
-                    index = lunr.MutableIndex.load(JSON.parse(payload.index));
+                    index = lunrMutable.Index.load(JSON.parse(payload.index));
                     resolve();
                 } else if(payload.type == 'sendTiddlers') {
                     for(let title of tiddlers) {
@@ -158,7 +159,7 @@ module SharedIndex {
     }
 
     export function load(data) {
-        index = lunr.MutableIndex.load(data);
+        index = lunrMutable.Index.load(data);
     }
 }
 export = SharedIndex;
