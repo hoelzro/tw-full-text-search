@@ -16,7 +16,7 @@ module-type: library
         });
     }
 
-    async function requireFromPage(name) : Promise<any> {
+    async function requireFromPage(name, sandbox?) : Promise<any> {
         postMessage({
             type: 'require',
             name: name,
@@ -26,7 +26,21 @@ module-type: library
             let mod = { exports: {} };
             self['module'] = mod;
             self['exports'] = mod.exports;
+            if(sandbox != null) {
+                for(let k in sandbox) {
+                    if(sandbox.hasOwnProperty(k)) {
+                        self[k] = sandbox[k];
+                    }
+                }
+            }
             importScripts(msg);
+            if(sandbox != null) {
+                for(let k in sandbox) {
+                    if(sandbox.hasOwnProperty(k)) {
+                        delete self[k];
+                    }
+                }
+            }
             delete self['module'];
             delete self['exports'];
 
@@ -54,7 +68,14 @@ module-type: library
     }
 
     let lunr : any = await requireFromPage('$:/plugins/hoelzro/full-text-search/lunr.min.js');
-    let lunrMutable : any = await requireFromPage('$:/plugins/hoelzro/full-text-search/lunr-mutable.js');
+    let lunrMutable : any = await requireFromPage('$:/plugins/hoelzro/full-text-search/lunr-mutable.js', {
+        require: function(modName) {
+            if(modName != '$:/plugins/hoelzro/full-text-search/lunr.min.js') {
+                throw new Error("Invalid module name for lunr-mutable!");
+            }
+            return lunr;
+        }
+    });
     let { generateQueryExpander } = await requireFromPage('$:/plugins/hoelzro/full-text-search/query-expander.js');
     let relatedTerms = await getRelatedTerms();
 
