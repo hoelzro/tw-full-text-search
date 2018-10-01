@@ -45,7 +45,7 @@ fts.json.tid: dist.html
 	git clone https://github.com/hoelzro/tw-progress-bar .build-wiki/plugins/progress-bar
 
 clean:
-	rm -f $(JS_FILES) fts.html fts.json.tid
+	rm -f $(JS_FILES) dist.html fts.json.tid
 
 realclean: clean
 	rm -rf .build-wiki/ .test-wiki/
