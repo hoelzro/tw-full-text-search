@@ -5,7 +5,7 @@ type: text/vnd.tiddlywiki
 
 !! 1.0.2 (2018-08-02)
 
-!! User-facing changes
+!!! User-facing changes
 
   * Upgraded to lunr.js 2.3.1, which includes new features like additional query operators.
 
