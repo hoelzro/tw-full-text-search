@@ -1,0 +1,11 @@
+caption: Relevance
+created: 20181007155154524
+modified: 20181007160844128
+tags: [[Query Examples]]
+title: Examples/Relevance
+
+Now here are the results for `fox`:
+
+<<list-links filter:"[!is[system]!tag[Query Examples]ftsearch[fox]]">>
+
+Note how here [[Foxes foxes foxes]] appears first in the result list, even though alphabetically it follows [[A fox in the garden]].  This is because the FTS plugin orders search results by relevance by default.  The way relevance is calculated is beyond the scope of these examples, but it's roughly equivalent to the number of times a token occurs in a tiddler.

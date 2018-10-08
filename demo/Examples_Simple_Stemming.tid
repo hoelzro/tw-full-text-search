@@ -1,0 +1,11 @@
+caption: Simple Stemming
+created: 20181007154232198
+modified: 20181007154857758
+tags: [[Query Examples]]
+title: Examples/Simple Stemming
+
+Here's the results looking for `jumps`:
+
+<<list-links filter:"[!is[current]!is[system]ftsearch[jumps]]">>
+
+Note how [[The quick fox jumped over the lazy dog]] is in the search results, even though "jumps" is itself not present - this is because the FTS plugin uses a process known as //stemming// to reduce both "jumped" and "jumps" to a root form.

@@ -1,0 +1,23 @@
+caption: Synonyms (experimental)
+created: 20181007160916290
+modified: 20181007162846487
+tags: [[Query Examples]]
+title: Examples/Synonyms
+
+Sometimes two words have the same or similar meaning; for example, a //vixen// is a specifc word that means "female fox".  Occasionally we want our search engines to treat certain sets of words as equivalent - the FTS plugin enables you to do that!
+
+Here's what the results look like for `vixen`:
+
+<<list-links filter:"[!is[system]!tag[Query Examples]ftsearch[vixen]]">>
+
+What's interesting here is that //none// of the tiddlers here have the word "vixen" in them - only fox!  The FTS plugin allows you to define synonyms in the [[$:/plugins/hoelzro/full-text-search/RelatedTerms.json]] tiddler - the format is a data tiddler with a list of strings, each of which is a ~TiddlyWiki list.  Here are the current contents that define "fox" and "vixen" as synonyms:
+
+{{ $:/plugins/hoelzro/full-text-search/RelatedTerms.json }}
+
+If you want to define a multi-word synonym, you'll use the `[[...]]` syntax:
+
+```
+["FTS [[Full Text Search]]"]
+```
+
+Since this feature is newer and experimental, there's no fancy UI for editing this tiddler - yet!  If you //do// edit it, you'll need to rebuild your FTS index from the control panel.

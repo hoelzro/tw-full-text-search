@@ -1,0 +1,38 @@
+created: 20181007164006666
+modified: 20181007171028534
+tags: 
+title: Introduction
+
+! What is This?
+
+This plugin adds full text search capabilities to ~TiddlyWiki, which provides features like language awareness (ex. treating jump, jumps, jumping, and jumped as different forms of the same word) and ordering results by search relevance, meaning the first result is going to be the one that the search engine figures as the closest match to what you're looking for.
+
+! Usage
+
+For examples of the plugin in action, have a look at [[Query Examples]].
+
+! Installation
+
+To install, drag and drop these plugins into your wiki:
+
+<$list filter="$:/plugins/hoelzro/progress-bar $:/plugins/hoelzro/full-text-search">
+<$set name="plugin-type" value={{!!plugin-type}}>
+<$set name="default-popup-state" value="no">
+<$set name="qualified-state" value=<<qualify "$:/state/plugin-info">>>
+{{||$:/core/ui/Components/plugin-info}}
+</$set>
+</$set>
+</$set>
+</$list>
+
+! Using FTS machinery in your own ~TiddlyWiki creations
+
+This plugin provides a filter operator named `ftsearch` which you can use in conjunction with other filter operators; it works exactly like ~TiddlyWiki's `search` operator, only you can't specify which field to search on - it always searches on title, tags, and text.
+
+! Reporting Bugs & Source Code
+
+The source code for this plugin is available on [[GitHub|https://github.com/hoelzro/tw-full-text-search]], and GitHub is also where the issue tracker for this plugin lives.
+
+! Credits
+
+This plugin is powered by [[lunr.js|https://lunrjs.com]].
