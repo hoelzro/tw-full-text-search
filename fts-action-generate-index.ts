@@ -32,6 +32,7 @@ let { generateQueryExpander } = require('$:/plugins/hoelzro/full-text-search/que
 
 module FTSActionGenerateIndex {
     const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
+    const USE_CACHE_TIDDLER = '$:/plugins/hoelzro/full-text-search/use-cache';
     const STATE_TIDDLER    = '$:/temp/FTS-state';
     const UPDATE_FREQUENCY = 10;
 
@@ -54,12 +55,13 @@ module FTSActionGenerateIndex {
         }
 
         async asyncInvokeAction() {
+            let shouldSuppressCache = this.wiki.getTiddlerText(USE_CACHE_TIDDLER) == 'no';
             var rebuilding = this.getAttribute('rebuild') === 'true';
             var filter = '[!is[system]]';
             var tiddlers;
             var isFresh;
 
-            var cacheData = rebuilding ? null : await cache.load();
+            var cacheData = (rebuilding || shouldSuppressCache) ? null : await cache.load();
             if(cacheData) {
                 var cacheAge = await cache.getAge();
                 filter += ' +[nsort[modified]]';
@@ -119,7 +121,9 @@ module FTSActionGenerateIndex {
                     }
                     if(progressCurrent == tiddlers.length) {
                         try {
-                            await cache.save(age, sharedIndex.getIndex().toJSON());
+                            if(!shouldSuppressCache) {
+                                await cache.save(age, sharedIndex.getIndex().toJSON());
+                            }
                         } catch(e) {
                             // failure to save the cache isn't great, but it's tolerable, so ignore it
                         }
