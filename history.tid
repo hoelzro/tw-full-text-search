@@ -3,6 +3,16 @@ type: text/vnd.tiddlywiki
 
 ! Release History
 
+!! 1.0.3 (2018-10-07)
+
+!!! User-facing changes
+
+  * Fixed advanced search result listing (GH #8)
+
+!!! Developer changes
+
+  * Allow wikis to disable the cache, primarly for the demo wiki that lives on hoelz.ro (GH #11)
+
 !! 1.0.2 (2018-08-02)
 
 !!! User-facing changes
