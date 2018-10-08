@@ -8,7 +8,7 @@ caption: Full Text Results
 {{$:/language/Search/Matches}}
 </$set>
 
-{{{ [ftsearch{$(searchTiddler)$}] }}}
+<$list filter="[ftsearch{$(searchTiddler)$}]" template="$:/core/ui/ListItemTemplate"/>
 \end
 
 <$set name="state" value="$:/temp/FTS-state">
