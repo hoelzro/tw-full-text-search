@@ -45,6 +45,9 @@ module SaveTiddlerHook {
                         if(!type.startsWith('text/')) {
                             continue;
                         }
+                        if('draft.of' in tiddler.fields) {
+                            continue;
+                        }
                         updateTiddler(index, tiddler);
                     }
                 } else { // change.deleted
