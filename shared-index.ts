@@ -70,6 +70,11 @@ module SharedIndex {
             if(!type.startsWith('text/')) {
                 continue;
             }
+
+            if('draft.of' in tiddler.fields) {
+                continue;
+            }
+
             updateTiddler(builder, tiddler);
             await progressCallback(i);
             await delay(1);
