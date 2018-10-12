@@ -54,7 +54,14 @@ module SaveTiddlerHook {
                     index.remove({ title: title });
                 }
             }
+
+            // Since actual changes are happening to lunr data structures outside of
+            // TiddlyWiki, we need to tell TiddlyWiki to rerender the page and any
+            // tiddlers whose contents may have changed due to the change in the index
+            let stateTiddler = $tw.wiki.getTiddler(STATE_TIDDLER);
+            $tw.wiki.addTiddler(stateTiddler);
         });
+
     }
 }
 
