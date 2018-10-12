@@ -326,6 +326,14 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             });
         });
 
+        it('should not pick up JavaScript code', function() {
+            prepare().then(function() {
+                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+                var results = wiki.compileFilter('[ftsearch[tag]]')();
+                expect(results).not.toContain('test-simple.js');
+            });
+        });
+
         it('should not fail upon an incomplete query', function() {
             prepare().then(function() {
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
