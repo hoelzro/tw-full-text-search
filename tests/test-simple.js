@@ -187,6 +187,16 @@ tags: [[$:/tags/test-spec]]
             { title: 'JustSomeText', text: 'This one has a modification date' },
             wiki.getModificationFields()));
 
+        wiki.addTiddler(new $tw.Tiddler(
+            {
+                title: 'Draft of New Tiddler',
+                'draft.of': 'New Tiddler',
+                'draft.title': 'New Tiddler',
+                text: 'test tiddler',
+            },
+            wiki.getCreationFields(),
+            wiki.getModificationFields()));
+
         nullDriverReady = false;
         localforage.defineDriver(nullDriver, function() {
             localforage.setDriver('nullDriver', function() {
@@ -333,9 +343,9 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             prepare().then(function() {
                 var draftTiddler = new $tw.Tiddler(
                     {
-                        title: 'Draft of New Tiddler',
-                        'draft.of': 'New Tiddler',
-                        'draft.title': 'New Tiddler',
+                        title: 'Draft of New Tiddler 2',
+                        'draft.of': 'New Tiddler 2',
+                        'draft.title': 'New Tiddler 2',
                         text: 'test tiddler',
                     },
                     wiki.getCreationFields(),
@@ -345,6 +355,13 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
 
                 return waitForNextTick();
             }).then(function() {
+                var results = wiki.filterTiddlers('[ftsearch[tiddler]has[draft.of]]');
+                expect(results.length).toBe(0);
+            });
+        });
+
+        it('should not index draft tiddlers from the start', function() {
+            prepare().then(function() {
                 var results = wiki.filterTiddlers('[ftsearch[tiddler]has[draft.of]]');
                 expect(results.length).toBe(0);
             });
