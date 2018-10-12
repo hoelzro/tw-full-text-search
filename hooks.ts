@@ -18,6 +18,8 @@ module SaveTiddlerHook {
         $tw.wiki.addEventListener('change', function(changes) {
             let index = getIndex();
 
+            let isIndexDirty = false;
+
             for(var title in changes) {
                 if(title == RELATED_TERMS_TIDDLER) {
                     clearIndex();
@@ -48,9 +50,13 @@ module SaveTiddlerHook {
                         if('draft.of' in tiddler.fields) {
                             continue;
                         }
+
+                        isIndexDirty = true;
+
                         updateTiddler(index, tiddler);
                     }
                 } else { // change.deleted
+                    isIndexDirty = true;
                     index.remove({ title: title });
                 }
             }
@@ -58,8 +64,10 @@ module SaveTiddlerHook {
             // Since actual changes are happening to lunr data structures outside of
             // TiddlyWiki, we need to tell TiddlyWiki to rerender the page and any
             // tiddlers whose contents may have changed due to the change in the index
-            let stateTiddler = $tw.wiki.getTiddler(STATE_TIDDLER);
-            $tw.wiki.addTiddler(stateTiddler);
+            if(isIndexDirty) {
+                let stateTiddler = $tw.wiki.getTiddler(STATE_TIDDLER);
+                $tw.wiki.addTiddler(stateTiddler);
+            }
         });
 
     }
