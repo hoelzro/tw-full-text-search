@@ -1,0 +1,98 @@
+author: Tobias Beer
+core-version: >=5.1.9
+dependents: 
+description: A widget and macro for inline sparkline diagrams
+documentation: https://tobibeer.github.io/tw5-sparkl
+list: readme defaults styles
+plugin-type: plugin
+requires: 
+revision: 0
+source: https://github.com/tobibeer/tw5-sparkl
+title: $:/plugins/tobibeer/sparkl
+type: application/json
+version: 0.5.2
+
+{
+    "tiddlers": {
+        "$:/plugins/tobibeer/sparkl/css": {
+            "title": "$:/plugins/tobibeer/sparkl/css",
+            "tags": "$:/tags/Stylesheet",
+            "text": "\\define color(id) {{$:/plugins/tobibeer/sparkl/defaults/colors/$id$}}\n\n.tc-sparkl{\r\n\tborder: 0;\r\n\tbackground: <<color bg>>;\r\n}\n\n.tc-sparkl-bar {\r\n\theight:1em;\r\n\tdisplay:inline-block;\r\n\toverflow:hidden;\r\n}\n\n.tc-sparkl-bar b {\r\n\toutline: 0;\r\n\theight:0;\r\n\tposition:relative;\r\n\tdisplay:inline-block;\r\n\tvertical-align: top;\r\n\tborder-left-color:transparent;\r\n\tborder-top-color:transparent;\r\n\tborder-top-style:solid;\r\n\tborder-bottom: 2em solid <<color fg>>;\r\n\tbackground: transparent;\r\n\tbox-sizing:content-box;\r\n}\n\n.tc-sparkl-bar:hover b{\r\n\tborder-top-color: <<color bg-hover>>;\r\n\tborder-bottom-color: <<color fg-hover>>;\r\n}\n\n.tc-sparkl-dots .tc-sparkl-bar b {\r\n\theight:2px;\r\n\tborder-bottom-color:transparent;\r\n}\n\n.tc-sparkl-dots .tc-sparkl-bar:hover b{\r\n\tborder-bottom-color: <<color bg-hover>>;\r\n}\n\n.tc-sparkl-dot {\r\n\tposition:absolute;\r\n\tbackground: <<color fg>>;\r\n}\n\n.tc-sparkl-bar:hover .tc-sparkl-dot{\r\n\tbackground: <<color fg-hover>>;\r\n}\r\n"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/as": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/as",
+            "text": "bars"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/default": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/default",
+            "text": "0"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/min": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/min",
+            "text": "0"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/max": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/max",
+            "text": "max"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/margin": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/margin",
+            "text": "1px"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/width": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/width",
+            "text": "5px"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/segments": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/segments",
+            "text": "20"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/link": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/link",
+            "text": "yes"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/dot-size": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/dot-size",
+            "text": "4"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/colors/fg": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/colors/fg",
+            "text": "<<colour primary>>"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/colors/bg": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/colors/bg",
+            "text": "transparent"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/colors/fg-hover": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/colors/fg-hover",
+            "text": "<<colour message-foreground>>"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults/colors/bg-hover": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults/colors/bg-hover",
+            "text": "<<colour message-background>>"
+        },
+        "$:/plugins/tobibeer/sparkl/defaults": {
+            "title": "$:/plugins/tobibeer/sparkl/defaults",
+            "text": "<dl>\r\n<$list filter=\"[all[system+shadows]prefix[$:/plugins/tobibeer/sparkl/defaults/]]\">\r\n<dt><$link><$view field=\"title\"/></$link></dt>\r\n<dd><code><$text text={{!!text}}/></code></dd>\r\n</$list>\r\n</dl>"
+        },
+        "$:/plugins/tobibeer/sparkl/macro": {
+            "title": "$:/plugins/tobibeer/sparkl/macro",
+            "tags": "$:/tags/Macro",
+            "text": "\\define sparkl(values,titles,class,default,min,max,width,margin,segments,link,as,dot-size)\r\n<$sparkl\r\nvalues=\"\"\"$values$\"\"\"\r\ntitles=\"\"\"$titles$\"\"\"\r\nclass=\"\"\"$class$\"\"\"\r\ndefault=\"\"\"$default$\"\"\"\r\nmin=\"\"\"$min$\"\"\"\r\nmax=\"\"\"$max$\"\"\"\r\nwidth=\"\"\"$width$\"\"\"\r\nmargin=\"\"\"$margin$\"\"\"\r\nsegments=\"\"\"$segments$\"\"\"\r\nlink=\"\"\"$link$\"\"\"\r\nas=\"\"\"$as$\"\"\"\r\ndot-size=\"\"\"$dot-size$\"\"\"/>\r\n\\end"
+        },
+        "$:/plugins/tobibeer/sparkl/readme": {
+            "title": "$:/plugins/tobibeer/sparkl/readme",
+            "text": "\\define D(v,d)\r\n<$vars v=\"$:/plugins/tobibeer/sparkl/defaults/$v$\">\r\n''$v$'': $d$ <$list filter=\"[<v>shadowsource[]]\" variable=\"none\"> / default: <code><$view tiddler=<<v>>/></code></$list>\r\n</$vars>\r\n\\end\n\nThe plugin $:/plugins/tobibeer/sparkl provides:\n\n; <$text text=\"<$sparkl/>\"/>\r\n: a widget to render simple sparkline diagrams\n\n; Attributes\r\n: <<D values \"space separated values<br>&nbsp;&nbsp;&nbsp;» or a filter like `[[%title%]get[number]]` for each `%title%` in ''titles''\">>\r\n: <<D titles \"filter for titles\">>\r\n: <<D class \"css class\">>\r\n: <<D default \"default when no value for field\">>\r\n: <<D min \"defined min for scale\">>\r\n: <<D max \"defined max for scale\">>\r\n: <<D width \"of a bar\">>\r\n: <<D margin \"left margin for a bar\">>\r\n: <<D segments \"accuracy of the scale\">>\r\n: <<D link \"links bars to titles\">>\r\n: <<D as \"the sparkline diagram as `bar` (default) or `dots`\">>\r\n: <<D dot-size \"when `as=dots`, the size of dots in px\">>\n\n; <$text text=\"<<sparkl values titles class default min max width margin segments>>\"/>\r\n: a simple macro wrapper\n\n<br>\n\n; documentation / examples / demos...\r\n: http://tobibeer.github.io/tw5-plugins#sparkl"
+        },
+        "$:/plugins/tobibeer/sparkl/styles": {
+            "title": "$:/plugins/tobibeer/sparkl/styles",
+            "text": "$:/plugins/tobibeer/sparkl/styles\n\n<pre><$text text={{$:/plugins/tobibeer/sparkl/css}}/></pre>"
+        },
+        "$:/plugins/tobibeer/sparkl/widget.js": {
+            "title": "$:/plugins/tobibeer/sparkl/widget.js",
+            "text": "/*\\\r\ntitle: $:/plugins/tobibeer/sparkl/widget.js\r\ntype: application/javascript\r\nmodule-type: widget\r\n\r\nThe sparkl widget renders simple inline sparkline diagrams\r\n\r\n@preserve\r\n\\*/\n(function(){\"use strict\";var t=require(\"$:/core/modules/widgets/widget.js\").widget,e=function(t,e){this.initialise(t,e)};e.prototype=new t;e.prototype.render=function(t,e){this.parentDomNode=t;this.nextSibling=e;this.computeAttributes();this.execute();if($tw.node){return}var i=this,s,l,r,a,n,d,u,o,h,p,f,g,m,c,b,k,w,x=[],T,y,A=[],$,N,v,C,S=i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/default\");if(!i.values||!i.titles&&i.filter){return}if(i.titles){$tw.utils.each(i.wiki.filterTiddlers(i.titles,i),function(t){x.push(t)})}$tw.utils.each(i.filter?x:i.values.split(\" \"),function(t){if(i.filter){t=i.wiki.filterTiddlers(i.values.replace(/%title%/gm,t),i);if(!t.length||isNaN(parseFloat(t[0],10))){t=i.default||S}else{t=t[0]}}t=parseFloat(t,10);if(isNaN(t)){t=0}if(c===undefined){c=t;g=t}if(g<t){g=t}if(c>t){c=t}A.push(t)});if(!A.length){return}p=i.link||i.filter?i.link===\"\"?i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/link\"):[\"false\",\"no\"].indexOf(i.link)>=0?0:i.link:0;m=i.max?i.max:i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/max\");if(m!==\"max\"){g=parseInt(m,10)}b=i.min?i.min:i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/min\");if(b!==\"min\"){if(b.charAt(b.length-1)===\"%\"){c=c-(g-c)*parseInt(b.substr(0,b.length-1),10)/100}else{c=parseInt(b,10)}}k=parseInt(i.segments,10);if(isNaN(k)){k=parseInt(i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/segments\"),10)||20}f=i.margin||i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/margin\")||0;C=i.width||i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/width\")||\"3px\";switch(A.length){case 1:C=\"1em\";break;case 2:C=\"0.5em\";break;case 3:C=\"0.33em\";break}l=document.createElement(\"span\");l.textContent=String.fromCharCode(160);a=i.classes?i.classes.split(\" \"):[];a.push(\"tc-sparkl\");s=i.as||i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/as\");if(s===\"dots\"){a.push(\"tc-sparkl-dots\");d=parseFloat(i.dotSize||i.wiki.getTiddlerText(\"$:/plugins/tobibeer/sparkl/defaults/dot-size\"),10);if(!d||isNaN(d)){d=2}}l.className=a.join(\" \");t.insertBefore(l,e);for(T=0;T<A.length;T++){w=x[T];if(p){v=document.createElement(\"a\");w=(p||\"\").indexOf(\"%title%\")<0?w:i.wiki.filterTiddlers(p.replace(/%title%/gm,x[T]),i)[0]||w;v.setAttribute(\"href\",\"#\"+w);v.style.cursor=\"pointer\"}else{v=document.createElement(\"span\")}v.className=\"tc-sparkl-bar\";v.title=w?w+\" (\"+A[T]+\")\":A[T];r=document.createElement(\"b\");r.style.width=C;y=g===c?0:1-(A[T]-c)/(g-c);y=Math.max(0,y);v.appendChild(r);l.appendChild(v);h=window.getComputedStyle(v,null).getPropertyValue(\"height\");h=parseFloat(h.substr(0,h.length-2),10);h=s===\"dots\"?h-3*d/2:h;y=h*Math.round(k*y)/k;r.style.borderTopWidth=y+\"px\";r.style.marginLeft=f;if(s===\"dots\"){u=d+\"px\";o=d/2+\"px\";n=document.createElement(\"i\");n.setAttribute(\"class\",\"tc-sparkl-dot tc-sparkl-dot-\"+i.dots);n.style.width=u;n.style.height=u;n.style.top=o;n.style.borderRadius=o;n.style.MozBorderRadius=o;n.style.WebkitBorderRadius=o;r.appendChild(n);$=window.getComputedStyle(r,null).getPropertyValue(\"width\");N=window.getComputedStyle(n,null).getPropertyValue(\"width\");$=parseFloat($.substr(0,$.length-2),10);N=parseFloat(N.substr(0,N.length-2),10);n.style.left=($-N)/2+\"px\"}}};e.prototype.execute=function(){this.values=this.getAttribute(\"values\");this.titles=this.getAttribute(\"titles\");this.default=this.getAttribute(\"default\");this.classes=this.getAttribute(\"class\");this.min=this.getAttribute(\"min\");this.max=this.getAttribute(\"max\");this.segments=this.getAttribute(\"segments\");this.width=this.getAttribute(\"width\");this.margin=this.getAttribute(\"margin\");this.link=(this.getAttribute(\"link\")||\"\").toLowerCase();this.as=this.getAttribute(\"as\");if(this.as&&this.as.indexOf(\"dots\")===0){this.dots=this.as.substr(5)||\"\";this.as=\"dots\";if(!this.dots||[\"circles\"].indexOf(this.dots)<0){this.dots=\"circles\"}}this.dotSize=this.getAttribute(\"dot-size\");if(this.values.indexOf(\"%title%\")>=0){this.filter=1}};e.prototype.refresh=function(){var t=this.computeAttributes();if(t.values||t.titles||t[\"class\"]||t.default||t.min||t.max||t.width||t.margin||t.segments||t.link||t.as||t.dotSize){this.refreshSelf();return true}else{return false}};exports.sparkl=e})();",
+            "type": "application/javascript",
+            "module-type": "widget"
+        }
+    }
+}
