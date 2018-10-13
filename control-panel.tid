@@ -33,4 +33,22 @@ Index generated.  Happy searching!
 
 </$reveal>
 
+! Auto Indexing
+
+<$list variable="fiveSixteenOrBetter" filter="5.1.16 [title<version>] +[sort[]first[]] +[prefix[5.1.16]]" emptyMessage="Sorry, you need TiddlyWiki 5.1.16 or greater to enable auto-indexing.">
+
+<$set name="autoIndexTiddler" value="$:/plugins/hoelzro/full-text-seach/auto-index">
+
+Automatic indexing refers to a feature where your wiki is automatically indexed in the background after it's been loaded.
+
+<$list filter="[title<autoIndexTiddler>get[title]]" emptyMessage="""<$button><$action-createtiddler $basetitle=<<autoIndexTiddler>> text="<$fts-action-generate-index />" tags="$:/tags/StartupAction/Browser" />Click here to enable automatic indexing</$button>""">
+<$button>
+  <$action-deletetiddler $tiddler=<<autoIndexTiddler>> />
+  Click here to disable automatic indexing
+</$button>
+</$list>
+
+</$set>
+</$list>
+
 </$set>
