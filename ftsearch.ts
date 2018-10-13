@@ -12,9 +12,9 @@ module FTSearch {
     var getIndex = require('$:/plugins/hoelzro/full-text-search/shared-index.js').getIndex;
 
     export function ftsearch(source, operator, options) {
-        var sourceLookup = {};
+        let sourceLookup = Object.create(null);
         source(function(tiddler, title) {
-            sourceLookup[title] = true;
+            sourceLookup[title] = tiddler;
         });
 
         var index = getIndex();
@@ -24,11 +24,13 @@ module FTSearch {
         try {
             var results = index.search(operator.operand);
 
-            return results.filter(function(match) {
-                return sourceLookup.hasOwnProperty(match.ref);
-            }).map(function(match) {
-                return match.ref;
-            });
+            return function(callback) {
+                for(let match of results) {
+                    if(match.ref in sourceLookup) {
+                        callback(sourceLookup[match.ref], match.ref);
+                    }
+                }
+            }
         } catch(e) {
             if(e instanceof lunr.QueryParseError) {
                 return [];
