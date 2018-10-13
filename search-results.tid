@@ -18,7 +18,9 @@ caption: Full Text Results
 <$view field="title"/>
 </$link>
 </td>
+<$list filter="[title[$:/plugins/tobibeer/sparkl]get[title]]">
 <td style="border-width: 0"><$macrocall $name="sparkl" values=<<sparklValues>> /></td>
+</$list>
 </tr>
 </$wikify>
 </$set>
