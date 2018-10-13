@@ -27,7 +27,7 @@ module FTSearch {
             return function(callback) {
                 for(let match of results) {
                     if(match.ref in sourceLookup) {
-                        callback(sourceLookup[match.ref], match.ref);
+                        callback(sourceLookup[match.ref], match.ref, match.score);
                     }
                 }
             }
