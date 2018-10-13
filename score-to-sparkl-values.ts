@@ -18,7 +18,12 @@ module ScoreToSparklValues {
         for(let i = 0; i < numTenBars; i++) {
             result.push(10);
         }
-        result.push(finalBarHeight);
+        if(finalBarHeight != 0) {
+            result.unshift(finalBarHeight);
+        }
+        while(result.length < 10) {
+            result.unshift(0);
+        }
         return result.join(' ');
     }
 }
