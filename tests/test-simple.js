@@ -385,6 +385,15 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(foxesFoxesFoxesIndex).toBeLessThan(foxInGardenIndex);
             });
         });
+
+        it('should gather scoring information into a tiddler if asked', function() {
+            prepare().then(function() {
+                let results = wiki.filterTiddlers('[ftsearch[fox]ftsgatherscores[$:/temp/score-data]]');
+                let scoringData = wiki.getTiddlerData('$:/temp/score-data');
+                expect('Foxes foxes foxes' in scoringData).toBeTruthy();
+                expect('A fox in the garden' in scoringData).toBeTruthy();
+            });
+        });
     });
 
     describe('Cache tests', function() {
