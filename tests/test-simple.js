@@ -374,6 +374,17 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 expect(results.length).toBe(0);
             });
         });
+
+        it('should order results by query relevance', function() {
+            prepare().then(function() {
+                var results = wiki.filterTiddlers('[ftsearch[fox]]');
+                let foxesFoxesFoxesIndex = results.indexOf('Foxes foxes foxes');
+                let foxInGardenIndex = results.indexOf('A fox in the garden');
+                expect(foxesFoxesFoxesIndex).not.toBe(-1);
+                expect(foxInGardenIndex).not.toBe(-1);
+                expect(foxesFoxesFoxesIndex).toBeLessThan(foxInGardenIndex);
+            });
+        });
     });
 
     describe('Cache tests', function() {
