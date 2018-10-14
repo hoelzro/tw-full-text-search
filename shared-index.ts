@@ -21,9 +21,9 @@ module SharedIndex {
 
     let index = null;
 
-    async function delay(millis : number) {
+    async function tick() {
         return new Promise(resolve => {
-            setTimeout(resolve, millis);
+            $tw.utils.nextTick(resolve);
         });
     }
 
@@ -77,7 +77,7 @@ module SharedIndex {
 
             updateTiddler(builder, tiddler);
             await progressCallback(i);
-            await delay(1);
+            await tick();
         }
         index = builder.build();
         await progressCallback(tiddlers.length);
