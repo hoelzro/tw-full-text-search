@@ -17,6 +17,7 @@ test: .test-wiki $(JS_FILES) $(TID_FILES) $(TEST_FILES) plugin.info
 	cp *.info $</plugins/full-text-search
 	cp -R files/ $</plugins/full-text-search
 	cp -R tests/ $</tiddlers/tests/
+	cp $(DEMO_FILES) $</tiddlers/
 	tiddlywiki $< --output $(shell pwd) --rendertiddler '$$:/core/save/all' /dev/null text/plain | perl -pnle 'if(/\d+\s+test.*(\d+)\s+failure/ && $$1 > 0) { $$failed = 1 } END { exit(1) if($$failed) }'
 
 dist.html: .build-wiki $(JS_FILES) $(TID_FILES) $(DEMO_FILES) plugin.info
