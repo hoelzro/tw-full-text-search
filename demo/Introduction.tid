@@ -25,19 +25,6 @@ To install, drag and drop these plugins into your wiki:
 </$set>
 </$list>
 
-Optionally, if you want the plugin to display a fancy bar next to each search result indicating how closely it matched the search, install Tobias' sparkl plugin:
-
-<$list filter="$:/plugins/tobibeer/sparkl">
-<$set name="plugin-type" value={{!!plugin-type}}>
-<$set name="default-popup-state" value="no">
-<$set name="qualified-state" value=<<qualify "$:/state/plugin-info">>>
-{{||$:/core/ui/Components/plugin-info}}
-</$set>
-</$set>
-</$set>
-</$list>
-
-
 ! Using FTS machinery in your own ~TiddlyWiki creations
 
 This plugin provides a filter operator named `ftsearch` which you can use in conjunction with other filter operators; it works exactly like ~TiddlyWiki's `search` operator, only you can't specify which field to search on - it always searches on title, tags, and text.

@@ -8,24 +8,7 @@ caption: Full Text Results
 {{$:/language/Search/Matches}}
 </$set>
 
-<table style="border-width: 0; margin: 0">
-<$list filter="[ftsearch{$(searchTiddler)$}ftsgatherscores[$:/temp/score-data]]">
-<$set name="score" filter="$:/temp/score-data +[getindex<currentTiddler>]" select="0">
-<$wikify name="sparklValues" text="""<$macrocall $name="fts-score-to-sparkl-values" score=<<score>> />""" mode="inline">
-<tr>
-<td style="border-width: 0; padding: 0 7px 0 0">
-<$link to={{!!title}}>
-<$view field="title"/>
-</$link>
-</td>
-<$list filter="[title[$:/plugins/tobibeer/sparkl]get[title]]">
-<td style="border-width: 0; padding: 0 0 0 7px"><$macrocall $name="sparkl" values=<<sparklValues>> /></td>
-</$list>
-</tr>
-</$wikify>
-</$set>
-</$list>
-</table>
+<$list filter="[ftsearch{$(searchTiddler)$}]" template="$:/core/ui/ListItemTemplate"/>
 \end
 
 <$set name="state" value="$:/temp/FTS-state">
