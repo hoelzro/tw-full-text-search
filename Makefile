@@ -23,7 +23,7 @@ test: .test-wiki $(JS_FILES) $(TID_FILES) $(TEST_FILES) plugin.info
 dist.html: .build-wiki $(JS_FILES) $(TID_FILES) $(DEMO_FILES) plugin.info
 	mkdir -p $</plugins/full-text-search
 	mkdir -p $</tiddlers
-	cp *.js $</plugins/full-text-search
+	cp $(JS_FILES) $</plugins/full-text-search
 	cp $(TID_FILES) $</plugins/full-text-search
 	cp $(DEMO_FILES) $</tiddlers/
 	cp *.info $</plugins/full-text-search
