@@ -48,6 +48,9 @@ fts.json.tid: dist.html
 	mkdir .build-wiki/plugins/
 	git clone https://github.com/hoelzro/tw-progress-bar .build-wiki/plugins/progress-bar
 
+plugin.info: plugin.info.in
+	jq --arg version $(shell git describe) '.version |= $$version' $^ > $@
+
 clean:
 	rm -f $(JS_FILES) dist.html fts.json.tid
 
