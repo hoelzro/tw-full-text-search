@@ -52,7 +52,7 @@ plugin.info: plugin.info.in
 	jq --arg version $(shell git describe) '.version |= $$version' $^ > $@
 
 clean:
-	rm -f $(JS_FILES) dist.html fts.json.tid
+	rm -f $(JS_FILES) dist.html fts.json.tid plugin.info
 
 realclean: clean
 	rm -rf .build-wiki/ .test-wiki/
