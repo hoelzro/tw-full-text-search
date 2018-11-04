@@ -46,16 +46,27 @@ MutableBuilder.prototype.build = function build () {
 
 MutableBuilder.prototype.remove = function remove (doc) {
   var docRef = doc[this._ref]
+  var fields = Object.keys(this._fields)
 
-  this.documentCount -= 1
+  var isDirty = false
 
-  for (var i = 0; i < this._fields.length; i++) {
-    var fieldName = this._fields[i],
+  for (var i = 0; i < fields.length; i++) {
+    var fieldName = fields[i],
         fieldRef = new lunr.FieldRef (docRef, fieldName)
+
+    if (fieldRef in this.fieldTermFrequencies || fieldRef in this.fieldLengths) {
+      isDirty = true
+    }
 
     delete this.fieldTermFrequencies[fieldRef]
     delete this.fieldLengths[fieldRef]
   }
+
+  if (!isDirty) {
+    return
+  }
+
+  this.documentCount -= 1
 
   // XXX what if a term disappears from the index?
   for (var term in this.invertedIndex) {
@@ -196,6 +207,7 @@ MutableIndex.prototype.checkDirty = function checkDirty () {
 MutableIndex.prototype.toJSON = function toJSON () {
   this.checkDirty()
 
+  // XXX do you need to serialize things that we could calculate post-load via builder.build?
   var json = lunr.Index.prototype.toJSON.call(this)
   json.builder = this.builder.toJSON()
   return json
@@ -302,7 +314,7 @@ var lunrMutable = function (config) {
   return builder.build()
 }
 
-lunrMutable.version = "2.3.1"
+lunrMutable.version = "2.3.2"
 
 lunrMutable.Builder = MutableBuilder
 lunrMutable.Index = MutableIndex
