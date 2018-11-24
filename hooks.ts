@@ -16,6 +16,8 @@ module SaveTiddlerHook {
         var { updateTiddler, getIndex, clearIndex } = require('$:/plugins/hoelzro/full-text-search/shared-index.js');
         let cache = require('$:/plugins/hoelzro/full-text-search/cache.js');
 
+        let logger = new $tw.utils.Logger('full-text-search');
+
         $tw.wiki.addEventListener('change', function(changes) {
             let index = getIndex();
 
@@ -25,6 +27,9 @@ module SaveTiddlerHook {
                 if(title == RELATED_TERMS_TIDDLER || title == FUZZY_SEARCH_TIDDLER) {
                     clearIndex();
                     let stateTiddler = $tw.wiki.getTiddler(STATE_TIDDLER);
+                    if(stateTiddler && stateTiddler.fields.text != 'uninitialized') {
+                        logger.alert('A configuration change occurred that has invalidated your FTS index; please rebuild the index from the control panel in order to use full text search');
+                    }
                     $tw.wiki.addTiddler(new $tw.Tiddler(
                         stateTiddler,
                         { text: 'uninitialized' },
