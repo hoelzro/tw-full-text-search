@@ -21,9 +21,7 @@ module FTSFeedback {
         }
       });
 
-      if(listOfFeedback.length > 0) {
-        options.wiki.setTiddlerData(targetTiddler, {messages: listOfFeedback});
-      }
+      options.wiki.setTiddlerData(targetTiddler, {messages: listOfFeedback});
     };
   }
 }
