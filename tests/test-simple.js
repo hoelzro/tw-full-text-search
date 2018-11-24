@@ -621,5 +621,22 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             var messages = wiki.getTiddlerData('$:/temp/fts-feedback', {messages:[]})['messages'];
             expect(messages.length).toBe(0);
         });
+
+        it('should always clear feedback upon search', async function() {
+            await disableFuzzySearch();
+            await addTiddler({
+                title: 'Experiment with Formatting'
+            });
+            await buildIndex();
+
+            var results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
+
+            await enableFuzzySearch();
+            await buildIndex();
+
+            results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
+            var messages = wiki.getTiddlerData('$:/temp/fts-feedback', {messages:[]})['messages'];
+            expect(messages.length).toBe(0);
+        });
     });
 })();
