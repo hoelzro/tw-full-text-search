@@ -56,37 +56,8 @@ tags: [[$:/tags/test-spec]]
         await widget.asyncInvokeAction();
     }
 
-    function prepare() {
-        return new Promise(function(resolve, reject) {
-            var finished = false;
-
-            // XXX wait for nullDriverReady first
-            runs(function() {
-                buildIndex().then(function() {
-                    var result = resolve();
-                    if(result instanceof Promise) {
-                        result.then(function() {
-                            // XXX multiple promise chain links, though?
-                            finished = true;
-                        }, function(err) {
-                            reject(err); // XXX will this work?
-                        });
-                    } else {
-                        finished = true;
-                    }
-                }, function(err) {
-                    reject(err);
-                });
-            });
-
-            waitsFor(function() {
-                return nullDriverReady && finished;
-            });
-
-            runs(function() {
-                resolve();
-            });
-        });
+    async function prepare() {
+        await buildIndex();
     }
 
     var fauxStorage = Object.create(null);
@@ -181,6 +152,7 @@ tags: [[$:/tags/test-spec]]
             },
             wiki.getCreationFields(),
             wiki.getModificationFields()));
+        // XXX wait for wiki to settle
 
         await localforage.defineDriver(nullDriver);
         await localforage.setDriver('nullDriver');
@@ -199,6 +171,7 @@ tags: [[$:/tags/test-spec]]
                 wiki.deleteTiddler(title);
             }
         }
+        // XXX wait for wiki to settle
     });
 
     describe('Simple test', function() {
@@ -386,24 +359,14 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            var finished = false;
+            await setupInMemoryDriver();
+            await localforage.clear();
+            await buildIndex();
+            await modifyTiddler();
+            await freshBuildIndex();
 
-            runs(async function() {
-                await setupInMemoryDriver();
-                await localforage.clear();
-                await buildIndex();
-                await modifyTiddler();
-                await freshBuildIndex();
-
-                finished = true;
-            });
-
-            waitsFor(() => finished);
-
-            runs(function() {
-                var results = wiki.compileFilter('[ftsearch[modification]]')();
-                expect(results).not.toContain('JustSomeText');
-            });
+            var results = wiki.compileFilter('[ftsearch[modification]]')();
+            expect(results).not.toContain('JustSomeText');
         });
 
         it('should not pick up tiddlers deleted between a save and cache load', async function() {
@@ -411,25 +374,16 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 wiki.deleteTiddler('JustSomeText');
                 await waitForNextTick();
             }
-            var finished = false;
 
-            runs(async function() {
-                await setupInMemoryDriver();
-                await localforage.clear();
-                await buildIndex();
-                await clearIndex();
-                await deleteTiddler();
-                await buildIndex();
+            await setupInMemoryDriver();
+            await localforage.clear();
+            await buildIndex();
+            await clearIndex();
+            await deleteTiddler();
+            await buildIndex();
 
-                finished = true;
-            });
-
-            waitsFor(() => finished);
-
-            runs(function() {
-                var results = wiki.compileFilter('[ftsearch[modification]]')();
-                expect(results).not.toContain('JustSomeText');
-            });
+            var results = wiki.compileFilter('[ftsearch[modification]]')();
+            expect(results).not.toContain('JustSomeText');
         });
 
         it('should not pick up tiddlers deleted and re-added between a save and cache load', async function() {
@@ -450,26 +404,16 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            var finished = false;
+            await setupInMemoryDriver();
+            await localforage.clear();
+            await buildIndex();
+            await clearIndex();
+            await deleteTiddler();
+            await readdTiddler();
+            await buildIndex();
 
-            runs(async function() {
-                await setupInMemoryDriver();
-                await localforage.clear();
-                await buildIndex();
-                await clearIndex();
-                await deleteTiddler();
-                await readdTiddler();
-                await buildIndex();
-
-                finished = true;
-            });
-
-            waitsFor(() => finished);
-
-            runs(function() {
-                var results = wiki.compileFilter('[ftsearch[modification]]')();
-                expect(results).not.toContain('JustSomeText');
-            });
+            var results = wiki.compileFilter('[ftsearch[modification]]')();
+            expect(results).not.toContain('JustSomeText');
         });
     });
 
@@ -485,21 +429,13 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            var finished = false;
-            runs(async function() {
-                await setupRelatedTerms();
-                await buildIndex();
-                finished = true;
-            });
+            await setupRelatedTerms();
+            await buildIndex();
 
-            waitsFor(() => finished);
-
-            runs(function() {
-                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
-                var results = wiki.compileFilter('[ftsearch[change]]')();
-                expect(results).toContain('NoModified');
-                expect(results).toContain('JustSomeText');
-            });
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            var results = wiki.compileFilter('[ftsearch[change]]')();
+            expect(results).toContain('NoModified');
+            expect(results).toContain('JustSomeText');
         });
 
         it("shouldn't expand anything if the config tiddler has no data", async function() {
@@ -509,21 +445,13 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            var finished = false;
-            runs(async function() {
-                await clearRelatedTerms();
-                await buildIndex();
-                finished = true;
-            });
+            await clearRelatedTerms();
+            await buildIndex();
 
-            waitsFor(() => finished);
-
-            runs(function() {
-                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
-                var results = wiki.compileFilter('[ftsearch[change]]')();
-                expect(results).not.toContain('NoModified');
-                expect(results).not.toContain('JustSomeText');
-            });
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            var results = wiki.compileFilter('[ftsearch[change]]')();
+            expect(results).not.toContain('NoModified');
+            expect(results).not.toContain('JustSomeText');
         });
 
         it("should invalidate the index if the config tiddler is changed", async function() {
@@ -543,20 +471,11 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            var finished = false;
-            runs(async function() {
-                await setupRelatedTerms();
-                await buildIndex();
-                await clearRelatedTerms();
+            await setupRelatedTerms();
+            await buildIndex();
+            await clearRelatedTerms();
 
-                finished = true;
-            });
-
-            waitsFor(() => finished);
-
-            runs(function() {
-                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
-            });
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
         });
 
         it('should rebuild the whole index if the config tiddler is changed and loaded from cache', async function() {
@@ -576,27 +495,18 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            var finished = false;
-            runs(async function() {
-                await setupInMemoryDriver();
-                await localforage.clear();
-                await setupRelatedTerms();
-                await buildIndex();
-                await clearRelatedTerms();
-                await clearIndex();
-                await buildIndex();
+            await setupInMemoryDriver();
+            await localforage.clear();
+            await setupRelatedTerms();
+            await buildIndex();
+            await clearRelatedTerms();
+            await clearIndex();
+            await buildIndex();
 
-                finished = true;
-            });
-
-            waitsFor(() => finished);
-
-            runs(function() {
-                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
-                var results = wiki.compileFilter('[ftsearch[change]]')();
-                expect(results).not.toContain('NoModified');
-                expect(results).not.toContain('JustSomeText');
-            });
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            var results = wiki.compileFilter('[ftsearch[change]]')();
+            expect(results).not.toContain('NoModified');
+            expect(results).not.toContain('JustSomeText');
         });
 
         it('should not break the indexer to use Related terms with a number as a member', async function() {
@@ -620,19 +530,10 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            var finished = false;
-            runs(async function() {
-                await setupRelatedTerms();
-                await buildIndex();
+            await setupRelatedTerms();
+            await buildIndex();
 
-                finished = true;
-            });
-
-            waitsFor(() => finished);
-
-            runs(function() {
-                expect(true).toBe(true);
-            });
+            expect(true).toBe(true);
         });
     });
 
