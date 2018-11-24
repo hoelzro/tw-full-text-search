@@ -551,6 +551,12 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             await waitForNextTick();
         }
 
+        async function deleteTiddler(title) {
+            wiki.deleteTiddler(title);
+
+            await waitForNextTick();
+        }
+
         // XXX test that the index (and cache) are invalidated when the fuzzy setting changes
         it('should return "formatting" if the user searches for "format*ing"', async function () {
             async function enableFuzzySearch() {
@@ -570,6 +576,22 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
             var results = wiki.filterTiddlers('[ftsearch[format*ing]]');
             expect(results).toContain('Experiment with Formatting');
+        });
+
+        it('should not return "formatting" if a fuzzy search is used and fuzzy searching is disabled', async function() {
+            async function disableFuzzySearch() {
+                await deleteTiddler('$:/plugins/hoelzro/full-text-search/EnableFuzzySearching');
+            }
+
+            await disableFuzzySearch();
+            await addTiddler({
+                title: 'Experiment with Formatting'
+            });
+            await buildIndex();
+
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            var results = wiki.filterTiddlers('[ftsearch[format*ing]]');
+            expect(results).not.toContain('Experiment with Formatting');
         });
     });
 })();
