@@ -539,4 +539,37 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
         });
     });
 
+    // XXX should I detect fuzzy queries and suggest users enable fuzzy searching?
+    describe('Wildcard tests', function() {
+        async function addTiddler(fields) {
+            wiki.addTiddler(new $tw.Tiddler(
+                wiki.getCreationFields(),
+                fields,
+                wiki.getModificationFields()
+            ));
+
+            await waitForNextTick();
+        }
+
+        // XXX test that the index (and cache) are invalidated when the fuzzy setting changes
+        it('should return "formatting" if the user searches for "format*ing"', async function () {
+            async function enableFuzzySearch() {
+                await addTiddler({
+                    title: '$:/plugins/hoelzro/full-text-search/EnableFuzzySearching',
+                    text: 'yes',
+                    type: 'text/vnd.tiddlywiki',
+                });
+            }
+
+            await enableFuzzySearch();
+            await addTiddler({
+                title: 'Experiment with Formatting'
+            });
+            await buildIndex();
+
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            var results = wiki.filterTiddlers('[ftsearch[format*ing]]');
+            expect(results).toContain('Experiment with Formatting');
+        });
+    });
 })();
