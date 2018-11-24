@@ -2,10 +2,10 @@ TSC=tsc
 TSCFLAGS=--pretty --module commonjs --alwaysStrict --noEmitOnError
 TSCLIBS=--lib esnext,dom
 
-JS_FILES=$(shell ls *.ts | perl -npe 's/[.]ts$$/.js/')
+JS_FILES=$(patsubst %.ts,%.js,$(wildcard *.ts))
 TID_FILES=$(shell ls *.tid | fgrep -v fts.json.tid)
-DEMO_FILES=$(shell ls demo/*.tid)
-TEST_FILES=$(shell ls tests/*.js)
+DEMO_FILES=$(wildcard demo/*.tid)
+TEST_FILES=$(wildcard tests/*.js)
 
 all: dist.html fts.json.tid
 
