@@ -56,6 +56,14 @@ module-type: library
         return await getNextMessage();
     }
 
+    async function getFuzzySetting() {
+        postMessage({
+            type: 'getFuzzySetting'
+        });
+
+        return await getNextMessage();
+    }
+
     async function* readTiddlers() {
         postMessage({ type: 'sendTiddlers' });
 
@@ -78,10 +86,23 @@ module-type: library
     });
     let { generateQueryExpander } = await requireFromPage('$:/plugins/hoelzro/full-text-search/query-expander.js');
     let relatedTerms = await getRelatedTerms();
+    let fuzzySetting = await getFuzzySetting();
 
     let expandQuery = generateQueryExpander(lunr, relatedTerms);
 
     let builder = new lunrMutable.Builder();
+
+    let stemmer;
+
+    if(fuzzySetting == 'yes') {
+        stemmer = function(unstemmedToken) {
+            let stemmedToken = lunr.stemmer(unstemmedToken.clone());
+
+            return [ unstemmedToken, stemmedToken ];
+        };
+    } else {
+        stemmer = lunr.stemmer;
+    }
 
     builder.pipeline.add(
       lunr.trimmer,

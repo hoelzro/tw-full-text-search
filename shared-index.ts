@@ -12,6 +12,7 @@ declare var setInterval;
 
 module SharedIndex {
     const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
+    const FUZZY_SEARCH_TIDDLER = '$:/plugins/hoelzro/full-text-search/EnableFuzzySearching';
     let lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
     let lunrMutable = require('$:/plugins/hoelzro/full-text-search/lunr-mutable.js');
     // XXX import?
@@ -37,16 +38,23 @@ module SharedIndex {
 
             builder = new lunrMutable.Builder();
 
+            let stemmer;
+
+            if(wiki.getTiddlerText(FUZZY_SEARCH_TIDDLER, '') == 'yes') {
+                stemmer = function(unstemmedToken) {
+                    let stemmedToken = lunr.stemmer(unstemmedToken.clone());
+
+                    return [ unstemmedToken, stemmedToken ];
+                };
+            } else {
+                stemmer = lunr.stemmer;
+            }
+
             builder.pipeline.add(
               lunr.trimmer,
               lunr.stopWordFilter,
               expandQuery,
-
-              function(unstemmedToken) {
-                  let stemmedToken = lunr.stemmer(unstemmedToken.clone());
-
-                  return [ unstemmedToken, stemmedToken ];
-              }
+              stemmer
             );
 
             builder.searchPipeline.add(
@@ -127,6 +135,10 @@ module SharedIndex {
                     progressCallback(payload.count);
                 } else if(payload.type == 'getRelatedTerms') {
                     worker.postMessage(relatedTerms);
+                } else if(payload.type == 'getFuzzySetting') {
+                    let fuzzySetting = wiki.getTiddlerText(FUZZY_SEARCH_TIDDLER, '');
+
+                    worker.postMessage(fuzzySetting);
                 }
             };
         });
