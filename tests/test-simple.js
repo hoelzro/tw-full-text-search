@@ -580,6 +580,9 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
 
         it('should detect fuzzy queries when fuzzy matching is off and notify the user', async function() {
             await disableFuzzySearch();
+            await addTiddler({
+                title: 'Experiment with Formatting'
+            });
             await buildIndex();
 
             var results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
