@@ -130,6 +130,14 @@ tags: [[$:/tags/test-spec]]
         initialTitles[title] = true;
     }
 
+    async function deleteTiddler(title) {
+        wiki.deleteTiddler(title);
+
+        while(wiki.getSizeOfTiddlerEventQueue() > 0) {
+            await waitForNextTick();
+        }
+    }
+
     beforeEach(async function() {
         // XXX clear localforage in memory cache?
         require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
@@ -164,16 +172,14 @@ tags: [[$:/tags/test-spec]]
     });
 
     afterEach(async function() {
-        // XXX this causes a bunch of events that are handled async =(
         var titles = wiki.compileFilter('[!is[system]]')();
+        var pending = [];
         for(var title of titles) {
             if(! (title in initialTitles)) {
-                wiki.deleteTiddler(title);
+                pending.push(deleteTiddler(title));
             }
         }
-        while(wiki.getSizeOfTiddlerEventQueue() > 0) {
-            await waitForNextTick();
-        }
+        await Promise.all(pending);
     });
 
     describe('Simple test', function() {
@@ -221,10 +227,7 @@ tags: [[$:/tags/test-spec]]
 
         it("should pick up on deletions after initial index", async function() {
             await prepare();
-
-            $tw.wiki.deleteTiddler('NoModified');
-
-            await waitForNextTick();
+            await deleteTiddler('NoModified');
 
             var results = wiki.compileFilter('[ftsearch[modification]]')();
             expect(results).not.toContain('NoModified');
@@ -372,16 +375,11 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
         });
 
         it('should not pick up tiddlers deleted between a save and cache load', async function() {
-            async function deleteTiddler() {
-                wiki.deleteTiddler('JustSomeText');
-                await waitForNextTick();
-            }
-
             await setupInMemoryDriver();
             await localforage.clear();
             await buildIndex();
             await clearIndex();
-            await deleteTiddler();
+            await deleteTiddler('JustSomeText');
             await buildIndex();
 
             var results = wiki.compileFilter('[ftsearch[modification]]')();
@@ -389,11 +387,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
         });
 
         it('should not pick up tiddlers deleted and re-added between a save and cache load', async function() {
-            async function deleteTiddler() {
-                wiki.deleteTiddler('JustSomeText');
-                await waitForNextTick();
-            }
-
             async function readdTiddler() {
                 var tiddler = $tw.wiki.getTiddler('JustSomeText');
 
@@ -410,7 +403,7 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             await localforage.clear();
             await buildIndex();
             await clearIndex();
-            await deleteTiddler();
+            await deleteTiddler('JustSomeText');
             await readdTiddler();
             await buildIndex();
 
@@ -420,6 +413,10 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
     });
 
     describe('Query expansion tests', function() {
+        async function clearRelatedTerms() {
+            await deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
+        }
+
         it('should expand change to modification', async function() {
             async function setupRelatedTerms() {
                 wiki.addTiddler(new $tw.Tiddler(
@@ -441,12 +438,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
         });
 
         it("shouldn't expand anything if the config tiddler has no data", async function() {
-            async function clearRelatedTerms() {
-                wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
-
-                await waitForNextTick();
-            }
-
             await clearRelatedTerms();
             await buildIndex();
 
@@ -467,12 +458,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 await waitForNextTick();
             }
 
-            async function clearRelatedTerms() {
-                wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
-
-                await waitForNextTick();
-            }
-
             await setupRelatedTerms();
             await buildIndex();
             await clearRelatedTerms();
@@ -487,12 +472,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                     {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: '["modification change"]', type: 'application/json'},
                     wiki.getModificationFields(),
                 ));
-
-                await waitForNextTick();
-            }
-
-            async function clearRelatedTerms() {
-                wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
 
                 await waitForNextTick();
             }
@@ -547,12 +526,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                 fields,
                 wiki.getModificationFields()
             ));
-
-            await waitForNextTick();
-        }
-
-        async function deleteTiddler(title) {
-            wiki.deleteTiddler(title);
 
             await waitForNextTick();
         }
