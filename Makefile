@@ -38,7 +38,9 @@ fts.json.tid: dist.html
 
 .test-wiki: .build-wiki
 	cp -R .build-wiki/ .test-wiki/
-	jq '(.plugins) |= . + ["tiddlywiki/jasmine"]' .test-wiki/tiddlywiki.info > .test-wiki/tiddlywiki.info.tmp
+	jq '(.plugins) |= . + ["hoelzro/jasmine3"]' .test-wiki/tiddlywiki.info > .test-wiki/tiddlywiki.info.tmp
+	git clone https://github.com/hoelzro/tw-modern-jasmine .test-wiki/plugins/jasmine3
+	(cd .test-wiki/plugins/jasmine3; npm install)
 	mv .test-wiki/tiddlywiki.info.tmp .test-wiki/tiddlywiki.info
 
 .build-wiki:
