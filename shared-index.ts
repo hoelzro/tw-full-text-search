@@ -46,6 +46,7 @@ module SharedIndex {
 
                     return [ unstemmedToken, stemmedToken ];
                 };
+                lunr.Pipeline.registerFunction(stemmer, 'stemmedAndUnstemmed');
             } else {
                 stemmer = lunr.stemmer;
             }
@@ -104,6 +105,14 @@ module SharedIndex {
         let relatedTerms = $tw.wiki.getTiddlerDataCached(RELATED_TERMS_TIDDLER, []);
         relatedTerms = relatedTerms.map($tw.utils.parseStringArray);
         let expandQuery = generateQueryExpander(lunr, relatedTerms);
+
+        // more action at a distance =/
+        let stemmer = function(unstemmedToken) {
+            let stemmedToken = lunr.stemmer(unstemmedToken.clone());
+
+            return [ unstemmedToken, stemmedToken ];
+        };
+        lunr.Pipeline.registerFunction(stemmer, 'stemmedAndUnstemmed');
 
         var workerFinished = new Promise(function(resolve, reject) {
             worker.onmessage = function(msg) {

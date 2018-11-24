@@ -100,6 +100,8 @@ module-type: library
 
             return [ unstemmedToken, stemmedToken ];
         };
+
+        lunr.Pipeline.registerFunction(stemmer, 'stemmedAndUnstemmed');
     } else {
         stemmer = lunr.stemmer;
     }
