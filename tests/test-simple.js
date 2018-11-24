@@ -592,6 +592,23 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             expect(feedback).toContain("It looks like you're trying to perform a fuzzy search; you'll need to enable fuzzy searching in the FTS settings");
         });
 
-        // XXX test that ftsfeedback doesn't prevent results from being returned
+        it('should not prevent results from being returned if ftsfeedback is used', async function() {
+            await disableFuzzySearch();
+            await addTiddler({
+                title: 'Experiment with Formatting'
+            });
+            await buildIndex();
+
+            var results = wiki.filterTiddlers('[ftsearch[formatting]ftsfeedback[$:/temp/fts-feedback]]');
+            expect(results).toContain('Experiment with Formatting');
+
+            await enableFuzzySearch();
+            await buildIndex();
+
+            results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
+            expect(results).toContain('Experiment with Formatting');
+        });
+
+        // XXX test that no feedback is present when fuzzy searching is on
     });
 })();
