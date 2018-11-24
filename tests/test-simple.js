@@ -609,6 +609,17 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             expect(results).toContain('Experiment with Formatting');
         });
 
-        // XXX test that no feedback is present when fuzzy searching is on
+        it('should not populate the feedback tiddler if fuzzy searching is on', async function() {
+            await enableFuzzySearch();
+            await addTiddler({
+                title: 'Experiment with Formatting'
+            });
+            await buildIndex();
+
+            var results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
+            expect(results).toContain('Experiment with Formatting');
+            var messages = wiki.getTiddlerData('$:/temp/fts-feedback', {messages:[]})['messages'];
+            expect(messages.length).toBe(0);
+        });
     });
 })();
