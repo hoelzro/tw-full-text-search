@@ -87,7 +87,12 @@ module-type: library
       lunr.trimmer,
       lunr.stopWordFilter,
       expandQuery,
-      lunr.stemmer
+
+      function(unstemmedToken) {
+          let stemmedToken = lunr.stemmer(unstemmedToken.clone());
+
+          return [ unstemmedToken, stemmedToken ];
+      }
     );
 
     builder.searchPipeline.add(
