@@ -163,7 +163,7 @@ tags: [[$:/tags/test-spec]]
         delete lunr.Pipeline.registeredFunctions.expandQuery;
     });
 
-    afterEach(function() {
+    afterEach(async function() {
         // XXX this causes a bunch of events that are handled async =(
         var titles = wiki.compileFilter('[!is[system]]')();
         for(var title of titles) {
@@ -171,7 +171,9 @@ tags: [[$:/tags/test-spec]]
                 wiki.deleteTiddler(title);
             }
         }
-        // XXX wait for wiki to settle
+        while(wiki.getSizeOfTiddlerEventQueue() > 0) {
+            await waitForNextTick();
+        }
     });
 
     describe('Simple test', function() {
