@@ -9,6 +9,7 @@ declare var $tw;
 
 module SaveTiddlerHook {
     const RELATED_TERMS_TIDDLER = '$:/plugins/hoelzro/full-text-search/RelatedTerms.json';
+    const FUZZY_SEARCH_TIDDLER = '$:/plugins/hoelzro/full-text-search/EnableFuzzySearching';
     const STATE_TIDDLER = '$:/temp/FTS-state';
 
     export function startup() {
@@ -21,7 +22,7 @@ module SaveTiddlerHook {
             let isIndexDirty = false;
 
             for(var title in changes) {
-                if(title == RELATED_TERMS_TIDDLER) {
+                if(title == RELATED_TERMS_TIDDLER || title == FUZZY_SEARCH_TIDDLER) {
                     clearIndex();
                     let stateTiddler = $tw.wiki.getTiddler(STATE_TIDDLER);
                     $tw.wiki.addTiddler(new $tw.Tiddler(
