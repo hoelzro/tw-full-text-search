@@ -530,7 +530,6 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
         });
     });
 
-    // XXX should I detect fuzzy queries and suggest users enable fuzzy searching?
     describe('Wildcard tests', function() {
         async function enableFuzzySearch() {
             await addTiddler({
@@ -578,5 +577,18 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
 
             expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
         });
+
+        it('should detect fuzzy queries when fuzzy matching is off and notify the user', async function() {
+            await disableFuzzySearch();
+            await buildIndex();
+
+            var results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
+            expect(results).not.toContain('Experiment with Formatting');
+
+            let feedback = wiki.getTiddlerData('$:/temp/fts-feedback', {messages:[]})['messages'];
+            expect(feedback).toContain("It looks like you're trying to perform a fuzzy search; you'll need to enable fuzzy searching in the FTS settings");
+        });
+
+        // XXX test that ftsfeedback doesn't prevent results from being returned
     });
 })();
