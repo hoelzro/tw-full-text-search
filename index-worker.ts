@@ -109,11 +109,7 @@ module-type: library
       lunr.stopWordFilter,
       expandQuery,
 
-      function(unstemmedToken) {
-          let stemmedToken = lunr.stemmer(unstemmedToken.clone());
-
-          return [ unstemmedToken, stemmedToken ];
-      }
+      stemmer
     );
 
     builder.searchPipeline.add(
