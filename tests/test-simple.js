@@ -48,16 +48,12 @@ tags: [[$:/tags/test-spec]]
         });
     }
 
-    function buildIndex() {
-        return new Promise(function(resolve, reject) {
-            var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
-            var widget = new FTSActionGenerateIndexWidget(null, {
-                wiki: wiki
-            });
-            widget.asyncInvokeAction().then(function() {
-                resolve();
-            });
+    async function buildIndex() {
+        var FTSActionGenerateIndexWidget = require('$:/plugins/hoelzro/full-text-search/fts-action-generate-index.js')['fts-action-generate-index'];
+        var widget = new FTSActionGenerateIndexWidget(null, {
+            wiki: wiki
         });
+        await widget.asyncInvokeAction();
     }
 
     function prepare() {
@@ -145,26 +141,15 @@ tags: [[$:/tags/test-spec]]
         }
     };
 
-    function setupInMemoryDriver() {
-        return new Promise(function(resolve, reject) {
-            // XXX how do I remove this driver after this test to make sure it doesn't interfere?
-            localforage.defineDriver(inMemoryDriver, function() {
-                localforage.setDriver('inMemoryDriver', function() {
-                    resolve();
-                }, function(err) {
-                    reject(err);
-                });
-            }, function(err) {
-                reject(err);
-            });
-        });
+    async function setupInMemoryDriver() {
+        // XXX how do I remove this driver after this test to make sure it doesn't interfere?
+        await localforage.defineDriver(inMemoryDriver);
+        await localforage.setDriver('inMemoryDriver');
     }
 
     function clearIndex() {
-        return new Promise(function(resolve, reject) {
-            require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
-            resolve();
-        });
+        require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
+        return Promise.resolve();
     }
 
     var nullDriverReady;
@@ -174,7 +159,7 @@ tags: [[$:/tags/test-spec]]
         initialTitles[title] = true;
     }
 
-    beforeEach(function() {
+    beforeEach(async function() {
         // XXX clear localforage in memory cache?
         require('$:/plugins/hoelzro/full-text-search/shared-index.js').clearIndex();
         wiki.addTiddler({
@@ -197,16 +182,9 @@ tags: [[$:/tags/test-spec]]
             wiki.getCreationFields(),
             wiki.getModificationFields()));
 
-        nullDriverReady = false;
-        localforage.defineDriver(nullDriver, function() {
-            localforage.setDriver('nullDriver', function() {
-                nullDriverReady = true;
-            }, function(err) {
-                throw err;
-            });
-        }, function(err) {
-            throw err;
-        });
+        await localforage.defineDriver(nullDriver);
+        await localforage.setDriver('nullDriver');
+        nullDriverReady = true;
 
         let lunr = require('$:/plugins/hoelzro/full-text-search/lunr.min.js');
 
@@ -228,162 +206,163 @@ tags: [[$:/tags/test-spec]]
             expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
         });
 
-        it('should find matching documents without a modified field', function() {
-            prepare().then(function() {
-                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
-                var results = wiki.compileFilter('[ftsearch[modification]]')();
-                expect(results).toContain('NoModified');
-            });
+        it('should find matching documents without a modified field', async function() {
+            await prepare();
+
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            var results = wiki.compileFilter('[ftsearch[modification]]')();
+            expect(results).toContain('NoModified');
         });
 
-        it("should pick up changes to tiddlers' contents", function() {
-            prepare().then(function() {
-                var tiddler = wiki.getTiddler('NoModified');
-                var newTiddler = new $tw.Tiddler(
-                    tiddler,
-                    {text: "New text without that word we're looking for"},
-                    wiki.getModificationFields());
-                wiki.addTiddler(newTiddler);
+        it("should pick up changes to tiddlers' contents", async function() {
+            await prepare();
 
-                return waitForNextTick();
-            }).then(function() {
-                var results = wiki.compileFilter('[ftsearch[modification]]')();
-                expect(results).not.toContain('NoModified');
+            var tiddler = wiki.getTiddler('NoModified');
+            var newTiddler = new $tw.Tiddler(
+                tiddler,
+                {text: "New text without that word we're looking for"},
+                wiki.getModificationFields());
+            wiki.addTiddler(newTiddler);
 
-                results = wiki.compileFilter('[ftsearch[looking]]')();
-                expect(results).toContain('NoModified');
-            });
+            await waitForNextTick();
+
+            var results = wiki.compileFilter('[ftsearch[modification]]')();
+            expect(results).not.toContain('NoModified');
+
+            results = wiki.compileFilter('[ftsearch[looking]]')();
+            expect(results).toContain('NoModified');
         });
 
-        it("should pick up on renames after initial index", function() {
-            prepare().then(function() {
-                $tw.wiki.renameTiddler('NoModified', 'BrandNewName');
-                return waitForNextTick();
-            }).then(function() {
-                var results = wiki.compileFilter('[ftsearch[modification]]')();
-                expect(results).toContain('BrandNewName');
-            });
+        it("should pick up on renames after initial index", async function() {
+            await prepare();
+
+            $tw.wiki.renameTiddler('NoModified', 'BrandNewName');
+
+            await waitForNextTick();
+
+            var results = wiki.compileFilter('[ftsearch[modification]]')();
+            expect(results).toContain('BrandNewName');
         });
 
-        it("should pick up on deletions after initial index", function() {
-            prepare().then(function() {
-                $tw.wiki.deleteTiddler('NoModified');
-                return waitForNextTick();
-            }).then(function() {
-                var results = wiki.compileFilter('[ftsearch[modification]]')();
-                expect(results).not.toContain('NoModified');
-            });
+        it("should pick up on deletions after initial index", async function() {
+            await prepare();
+
+            $tw.wiki.deleteTiddler('NoModified');
+
+            await waitForNextTick();
+
+            var results = wiki.compileFilter('[ftsearch[modification]]')();
+            expect(results).not.toContain('NoModified');
         });
 
-        it('should pick reason with "reason programming language"', function() {
-            prepare().then(function() {
-                var text = `
+        it('should pick reason with "reason programming language"', async function() {
+            await prepare();
+
+            var text = `
 A kind of OCaml that compiles down to JavaScript
 
 https://facebook.github.io/reason/
 
 https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
-                `;
-                $tw.wiki.addTiddler(new $tw.Tiddler(
-                    $tw.wiki.getCreationFields(),
-                    { title: 'Reason', tags: 'Someday/Maybe Play Coding [[Programming Languages]]', type: 'text/vnd.tiddlywiki', text: text },
-                    $tw.wiki.getModificationFields()
-                ));
-                return waitForNextTick();
-            }).then(function() {
-                var results = wiki.compileFilter('[ftsearch[reason programming language]]')();
-                expect(results).toContain('Reason');
-            });
+            `;
+            $tw.wiki.addTiddler(new $tw.Tiddler(
+                $tw.wiki.getCreationFields(),
+                { title: 'Reason', tags: 'Someday/Maybe Play Coding [[Programming Languages]]', type: 'text/vnd.tiddlywiki', text: text },
+                $tw.wiki.getModificationFields()
+            ));
+            await waitForNextTick();
+
+            var results = wiki.compileFilter('[ftsearch[reason programming language]]')();
+            expect(results).toContain('Reason');
         });
 
-        xit('should pick up "twitter" in a URL', function() {
-            prepare().then(function() {
-                var text = 'https://twitter.com/hoelzro/status/877901644125663232';
-                $tw.wiki.addTiddler(new $tw.Tiddler(
-                    $tw.wiki.getCreationFields(),
-                    { title: 'ContainsTweetLink', type: 'text/vnd.tiddlywiki', text: text },
-                    $tw.wiki.getModificationFields()
-                ));
-                return waitForNextTick();
-            }).then(function() {
-                var results = wiki.compileFilter('[ftsearch[twitter]]')();
-                expect(results).toContain('ContainsTweetLink');
-            });
+        xit('should pick up "twitter" in a URL', async function() {
+            await prepare();
+            var text = 'https://twitter.com/hoelzro/status/877901644125663232';
+            $tw.wiki.addTiddler(new $tw.Tiddler(
+                $tw.wiki.getCreationFields(),
+                { title: 'ContainsTweetLink', type: 'text/vnd.tiddlywiki', text: text },
+                $tw.wiki.getModificationFields()
+            ));
+            await waitForNextTick();
+
+            var results = wiki.compileFilter('[ftsearch[twitter]]')();
+            expect(results).toContain('ContainsTweetLink');
         });
 
-        it('should not pick up a non-text tiddler on an update', function() {
-            prepare().then(function() {
-                var newTiddler = new $tw.Tiddler(
-                    wiki.getCreationFields(),
-                    {type: 'application/x-tiddler-data', text: 'foo bar', title: 'MyDataTiddler'},
-                    wiki.getModificationFields());
-                wiki.addTiddler(newTiddler);
+        it('should not pick up a non-text tiddler on an update', async function() {
+            await prepare();
 
-                return waitForNextTick();
-            }).then(function() {
-                var results = wiki.compileFilter('[ftsearch[foo]]')();
-                expect(results).not.toContain('MyDataTiddler');
-            });
+            var newTiddler = new $tw.Tiddler(
+                wiki.getCreationFields(),
+                {type: 'application/x-tiddler-data', text: 'foo bar', title: 'MyDataTiddler'},
+                wiki.getModificationFields());
+            wiki.addTiddler(newTiddler);
+
+            await waitForNextTick();
+
+            var results = wiki.compileFilter('[ftsearch[foo]]')();
+            expect(results).not.toContain('MyDataTiddler');
         });
 
-        it('should not pick up JavaScript code', function() {
-            prepare().then(function() {
-                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
-                var results = wiki.compileFilter('[ftsearch[tag]]')();
-                expect(results).not.toContain('test-simple.js');
-            });
+        it('should not pick up JavaScript code', async function() {
+            await prepare();
+
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            var results = wiki.compileFilter('[ftsearch[tag]]')();
+            expect(results).not.toContain('test-simple.js');
         });
 
-        it('should not fail upon an incomplete query', function() {
-            prepare().then(function() {
-                expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
-                try {
-                    var results = wiki.compileFilter('[ftsearch[date~]]')();
-                    expect(results.length).toBe(0);
-                } catch(e) {
-                    console.log(e);
-                    expect(true).toBe(false);
-                }
-            });
-        });
+        it('should not fail upon an incomplete query', async function() {
+            await prepare();
 
-        it('should not index new draft tiddlers', function() {
-            prepare().then(function() {
-                var draftTiddler = new $tw.Tiddler(
-                    {
-                        title: 'Draft of New Tiddler 2',
-                        'draft.of': 'New Tiddler 2',
-                        'draft.title': 'New Tiddler 2',
-                        text: 'test tiddler',
-                    },
-                    wiki.getCreationFields(),
-                    wiki.getModificationFields());
-
-                wiki.addTiddler(draftTiddler);
-
-                return waitForNextTick();
-            }).then(function() {
-                var results = wiki.filterTiddlers('[ftsearch[tiddler]has[draft.of]]');
+            expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
+            try {
+                var results = wiki.compileFilter('[ftsearch[date~]]')();
                 expect(results.length).toBe(0);
-            });
+            } catch(e) {
+                console.log(e);
+                expect(true).toBe(false);
+            }
         });
 
-        it('should not index draft tiddlers from the start', function() {
-            prepare().then(function() {
-                var results = wiki.filterTiddlers('[ftsearch[tiddler]has[draft.of]]');
-                expect(results.length).toBe(0);
-            });
+        it('should not index new draft tiddlers', async function() {
+            await prepare();
+
+            var draftTiddler = new $tw.Tiddler(
+                {
+                    title: 'Draft of New Tiddler 2',
+                    'draft.of': 'New Tiddler 2',
+                    'draft.title': 'New Tiddler 2',
+                    text: 'test tiddler',
+                },
+                wiki.getCreationFields(),
+                wiki.getModificationFields());
+
+            wiki.addTiddler(draftTiddler);
+
+            await waitForNextTick();
+
+            var results = wiki.filterTiddlers('[ftsearch[tiddler]has[draft.of]]');
+            expect(results.length).toBe(0);
         });
 
-        it('should order results by query relevance', function() {
-            prepare().then(function() {
-                var results = wiki.filterTiddlers('[ftsearch[fox]]');
-                let foxesFoxesFoxesIndex = results.indexOf('Foxes foxes foxes');
-                let foxInGardenIndex = results.indexOf('A fox in the garden');
-                expect(foxesFoxesFoxesIndex).not.toBe(-1);
-                expect(foxInGardenIndex).not.toBe(-1);
-                expect(foxesFoxesFoxesIndex).toBeLessThan(foxInGardenIndex);
-            });
+        it('should not index draft tiddlers from the start', async function() {
+            await prepare();
+
+            var results = wiki.filterTiddlers('[ftsearch[tiddler]has[draft.of]]');
+            expect(results.length).toBe(0);
+        });
+
+        it('should order results by query relevance', async function() {
+            await prepare();
+
+            var results = wiki.filterTiddlers('[ftsearch[fox]]');
+            let foxesFoxesFoxesIndex = results.indexOf('Foxes foxes foxes');
+            let foxInGardenIndex = results.indexOf('A fox in the garden');
+            expect(foxesFoxesFoxesIndex).not.toBe(-1);
+            expect(foxInGardenIndex).not.toBe(-1);
+            expect(foxesFoxesFoxesIndex).toBeLessThan(foxInGardenIndex);
         });
     });
 
@@ -394,37 +373,32 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             return clearIndex().then(buildIndex);
         }
 
-        it('should work with the cache', function() {
-            function modifyTiddler() {
+        it('should work with the cache', async function() {
+            async function modifyTiddler() {
                 var tiddler = $tw.wiki.getTiddler('JustSomeText');
 
-                return new Promise(function(resolve, reject) {
-                    var newTiddler = new $tw.Tiddler(
-                        tiddler,
-                        {text: "New text without that word we're looking for"},
-                        wiki.getModificationFields());
-                    wiki.addTiddler(newTiddler);
+                var newTiddler = new $tw.Tiddler(
+                    tiddler,
+                    {text: "New text without that word we're looking for"},
+                    wiki.getModificationFields());
+                wiki.addTiddler(newTiddler);
 
-                    $tw.utils.nextTick(function() {
-                        resolve();
-                    });
-                });
+                await waitForNextTick();
             }
 
             var finished = false;
 
-            runs(function() {
-                setupInMemoryDriver().then(
-                localforage.clear).then(
-                buildIndex).then(
-                modifyTiddler).then(
-                freshBuildIndex).then(
-                function() { finished = true });
+            runs(async function() {
+                await setupInMemoryDriver();
+                await localforage.clear();
+                await buildIndex();
+                await modifyTiddler();
+                await freshBuildIndex();
+
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 var results = wiki.compileFilter('[ftsearch[modification]]')();
@@ -432,30 +406,25 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             });
         });
 
-        it('should not pick up tiddlers deleted between a save and cache load', function() {
-            function deleteTiddler() {
-                return new Promise(function(resolve, reject) {
-                    wiki.deleteTiddler('JustSomeText');
-                    $tw.utils.nextTick(function() {
-                        resolve();
-                    });
-                });
+        it('should not pick up tiddlers deleted between a save and cache load', async function() {
+            async function deleteTiddler() {
+                wiki.deleteTiddler('JustSomeText');
+                await waitForNextTick();
             }
             var finished = false;
 
-            runs(function() {
-                setupInMemoryDriver().then(
-                localforage.clear).then(
-                buildIndex).then(
-                clearIndex).then(
-                deleteTiddler).then(
-                buildIndex).then(
-                function() { finished = true });
+            runs(async function() {
+                await setupInMemoryDriver();
+                await localforage.clear();
+                await buildIndex();
+                await clearIndex();
+                await deleteTiddler();
+                await buildIndex();
+
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 var results = wiki.compileFilter('[ftsearch[modification]]')();
@@ -463,48 +432,39 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             });
         });
 
-        it('should not pick up tiddlers deleted and re-added between a save and cache load', function() {
-            function deleteTiddler() {
-                return new Promise(function(resolve, reject) {
-                    wiki.deleteTiddler('JustSomeText');
-                    $tw.utils.nextTick(function() {
-                        resolve();
-                    });
-                });
+        it('should not pick up tiddlers deleted and re-added between a save and cache load', async function() {
+            async function deleteTiddler() {
+                wiki.deleteTiddler('JustSomeText');
+                await waitForNextTick();
             }
 
-            function readdTiddler() {
+            async function readdTiddler() {
                 var tiddler = $tw.wiki.getTiddler('JustSomeText');
 
-                return new Promise(function(resolve, reject) {
-                    var newTiddler = new $tw.Tiddler(
-                        tiddler,
-                        {text: "New text without that word we're looking for"},
-                        wiki.getModificationFields());
-                    wiki.addTiddler(newTiddler);
+                var newTiddler = new $tw.Tiddler(
+                    tiddler,
+                    {text: "New text without that word we're looking for"},
+                    wiki.getModificationFields());
+                wiki.addTiddler(newTiddler);
 
-                    $tw.utils.nextTick(function() {
-                        resolve();
-                    });
-                });
+                await waitForNextTick();
             }
 
             var finished = false;
 
-            runs(function() {
-                setupInMemoryDriver().then(
-                localforage.clear).then(
-                buildIndex).then(
-                clearIndex).then(
-                deleteTiddler).then(
-                readdTiddler).then(
-                buildIndex).then(
-                function() { finished = true });
+            runs(async function() {
+                await setupInMemoryDriver();
+                await localforage.clear();
+                await buildIndex();
+                await clearIndex();
+                await deleteTiddler();
+                await readdTiddler();
+                await buildIndex();
+
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 var results = wiki.compileFilter('[ftsearch[modification]]')();
@@ -514,26 +474,25 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
     });
 
     describe('Query expansion tests', function() {
-        it('should expand change to modification', function() {
-            function setupRelatedTerms() {
+        it('should expand change to modification', async function() {
+            async function setupRelatedTerms() {
                 wiki.addTiddler(new $tw.Tiddler(
                     wiki.getCreationFields(),
                     {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: '["modification change"]', type: 'application/json'},
                     wiki.getModificationFields(),
                 ));
 
-                return waitForNextTick();
+                await waitForNextTick();
             }
 
             var finished = false;
-            runs(function() {
-                setupRelatedTerms().then(
-                buildIndex).then(function() { finished = true });
+            runs(async function() {
+                await setupRelatedTerms();
+                await buildIndex();
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
@@ -543,22 +502,21 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             });
         });
 
-        it("shouldn't expand anything if the config tiddler has no data", function() {
-            function clearRelatedTerms() {
+        it("shouldn't expand anything if the config tiddler has no data", async function() {
+            async function clearRelatedTerms() {
                 wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
 
-                return waitForNextTick();
+                await waitForNextTick();
             }
 
             var finished = false;
-            runs(function() {
-                clearRelatedTerms().then(
-                buildIndex).then(function() { finished = true });
+            runs(async function() {
+                await clearRelatedTerms();
+                await buildIndex();
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
@@ -568,70 +526,70 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             });
         });
 
-        it("should invalidate the index if the config tiddler is changed", function() {
-            function setupRelatedTerms() {
+        it("should invalidate the index if the config tiddler is changed", async function() {
+            async function setupRelatedTerms() {
                 wiki.addTiddler(new $tw.Tiddler(
                     wiki.getCreationFields(),
                     {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: '["modification change"]', type: 'application/json'},
                     wiki.getModificationFields(),
                 ));
 
-                return waitForNextTick();
+                await waitForNextTick();
             }
 
-            function clearRelatedTerms() {
+            async function clearRelatedTerms() {
                 wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
 
-                return waitForNextTick();
+                await waitForNextTick();
             }
 
             var finished = false;
-            runs(function() {
-                setupRelatedTerms().then(
-                buildIndex).then(
-                clearRelatedTerms).then(function() { finished = true });
+            runs(async function() {
+                await setupRelatedTerms();
+                await buildIndex();
+                await clearRelatedTerms();
+
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('uninitialized');
             });
         });
 
-        it('should rebuild the whole index if the config tiddler is changed and loaded from cache', function() {
-            function setupRelatedTerms() {
+        it('should rebuild the whole index if the config tiddler is changed and loaded from cache', async function() {
+            async function setupRelatedTerms() {
                 wiki.addTiddler(new $tw.Tiddler(
                     wiki.getCreationFields(),
                     {title: '$:/plugins/hoelzro/full-text-search/RelatedTerms.json', text: '["modification change"]', type: 'application/json'},
                     wiki.getModificationFields(),
                 ));
 
-                return waitForNextTick();
+                await waitForNextTick();
             }
 
-            function clearRelatedTerms() {
+            async function clearRelatedTerms() {
                 wiki.deleteTiddler('$:/plugins/hoelzro/full-text-search/RelatedTerms.json');
 
-                return waitForNextTick();
+                await waitForNextTick();
             }
 
             var finished = false;
-            runs(function() {
-                setupInMemoryDriver().then(
-                localforage.clear).then(
-                setupRelatedTerms).then(
-                buildIndex).then(
-                clearRelatedTerms).then(
-                clearIndex).then(
-                buildIndex).then(function() { finished = true });
+            runs(async function() {
+                await setupInMemoryDriver();
+                await localforage.clear();
+                await setupRelatedTerms();
+                await buildIndex();
+                await clearRelatedTerms();
+                await clearIndex();
+                await buildIndex();
+
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 expect(wiki.getTiddlerText('$:/temp/FTS-state')).toBe('initialized');
@@ -641,8 +599,8 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             });
         });
 
-        it('should not break the indexer to use Related terms with a number as a member', function() {
-            function setupRelatedTerms() {
+        it('should not break the indexer to use Related terms with a number as a member', async function() {
+            async function setupRelatedTerms() {
                 let relatedTermList = [
                     "foobar [[foo 2]]"
                 ];
@@ -659,22 +617,23 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
                     wiki.getModificationFields(),
                 ));
 
-                return waitForNextTick();
+                await waitForNextTick();
             }
 
             var finished = false;
-            runs(function() {
-                setupRelatedTerms().then(
-                buildIndex).then(function() { finished = true });
+            runs(async function() {
+                await setupRelatedTerms();
+                await buildIndex();
+
+                finished = true;
             });
 
-            waitsFor(function() {
-                return finished;
-            });
+            waitsFor(() => finished);
 
             runs(function() {
                 expect(true).toBe(true);
             });
         });
     });
+
 })();
