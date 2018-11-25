@@ -65,7 +65,7 @@ module FTSActionGenerateIndex {
             if(cacheData) {
                 var cacheAge = await cache.getAge();
                 filter += ' +[nsort[modified]]';
-                var titles = this.wiki.compileFilter(filter)();
+                var titles = this.wiki.filterTiddlers(filter);
                 tiddlers = [];
 
                 for(let i = titles.length - 1; i >= 0; i--) {
@@ -97,10 +97,10 @@ module FTSActionGenerateIndex {
                 sharedIndex.load(cacheData);
                 isFresh = false;
             } else {
-                tiddlers = this.wiki.compileFilter(filter)();
+                tiddlers = this.wiki.filterTiddlers(filter);
                 isFresh = true;
             }
-            var age = this.wiki.compileFilter(filter + ' +[nsort[modified]last[]get[modified]]')()[0];
+            var age = this.wiki.filterTiddlers(filter + ' +[nsort[modified]last[]get[modified]]')[0];
             age = age == null ? '0' : age;
             var stateTiddler = this.wiki.getTiddler(STATE_TIDDLER);
             if(tiddlers.length > 0) {
