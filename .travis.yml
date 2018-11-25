@@ -9,3 +9,6 @@ matrix:
     - env: TIDDLYWIKI=5.1.17
     - env: TIDDLYWIKI=5.1.16
     - env: TIDDLYWIKI=5.1.15
+
+git:
+    depth: 200
