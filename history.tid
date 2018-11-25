@@ -11,7 +11,7 @@ type: text/vnd.tiddlywiki
 
 !!! Developer changes
 
-  * Allow wikis to disable the cache, primarly for the demo wiki that lives on hoelz.ro (GH #11)
+  * Allow wikis to disable the cache, primarily for the demo wiki that lives on hoelz.ro (GH #11)
 
 !! 1.0.2 (2018-08-02)
 
