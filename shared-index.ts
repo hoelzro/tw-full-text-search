@@ -160,10 +160,15 @@ module SharedIndex {
 
     export async function buildIndex(wiki, tiddlers, isFresh, progressCallback) {
         if($tw.browser && isFresh) {
-            return buildIndexWorker(wiki, tiddlers, progressCallback);
-        } else {
-            return buildIndexIncremental(wiki, tiddlers, isFresh, progressCallback);
+            try {
+                return await buildIndexWorker(wiki, tiddlers, progressCallback);
+            } catch(e) {
+                console.log(e);
+                console.log('falling back to incremental indexing...');
+            }
         }
+
+        return await buildIndexIncremental(wiki, tiddlers, isFresh, progressCallback);
     }
 
     export function updateTiddler(builder, tiddler) {
