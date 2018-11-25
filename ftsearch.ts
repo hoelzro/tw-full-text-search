@@ -22,8 +22,11 @@ module FTSearch {
         if(!index) {
             return [];
         }
-        try {
-            return function(callback) {
+
+        return function(callback) {
+            let results;
+
+            try {
                 let fuzzySearchesEnabled = options.wiki.getTiddlerText(FUZZY_SEARCH_TIDDLER, '') == 'yes';
                 if(!fuzzySearchesEnabled) {
                     let qp = new lunr.QueryParser(operator.operand, new lunr.Query(['title', 'tags', 'text']));
@@ -37,21 +40,21 @@ module FTSearch {
                     }
                 }
 
-                var results = index.search(operator.operand);
-
-                for(let match of results) {
-                    if(match.ref in sourceLookup) {
-                        callback(sourceLookup[match.ref], match.ref);
-                    }
+                results = index.search(operator.operand);
+            } catch(e) {
+                if(e instanceof lunr.QueryParseError) {
+                    results = [];
+                } else {
+                    throw e;
                 }
             }
-        } catch(e) {
-            if(e instanceof lunr.QueryParseError) {
-                return [];
-            } else {
-                throw e;
+
+            for(let match of results) {
+                if(match.ref in sourceLookup) {
+                    callback(sourceLookup[match.ref], match.ref);
+                }
             }
-        }
+        };
     };
 }
 
