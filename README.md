@@ -23,7 +23,6 @@ Each time you start a new TiddlyWiki session, you'll need to build the FTS index
   * Display score for search results
   * Specify a filter for tiddlers to be included in the index.
   * Custom stemmers for non-English/mixed language wikis
-  * Automatically index in the background upon startup
 
 # Source Code
 
