@@ -51,19 +51,23 @@ Automatic indexing refers to a feature where your wiki is automatically indexed 
 </$set>
 </$list>
 
-! Wildcard Searching (experimental)
+! Wildcard/Fuzzy Searching (experimental)
 
 Wildcard searches allow you to use wildcards to do things like use `format*ing` to match both "formating" and "formatting".
 Please consult [[the lunr documentation|https://lunrjs.com/guides/searching.html#wildcards]] for more information.
 
+Fuzzy searches allow you to compensate for spelling mistakes by specifying an //edit distance// - for example, if you want
+to tolerate being off by one character, you'd searching for `formattign~1`.  For performance, it's recommended to keep
+the distance below 3.  You can read more about fuzzy searching in [[the lunr documentation|https://lunrjs.com/guides/searching.html#fuzzy-matches]].
+
 Note that you don't need wildcards to have the search system treat "format", "formatting", and "formatted" as the same -
 the default setup is smart enough to handle this!
 
-Enabling wildcard searches takes more computing power, memory, and storage space, but does prove useful for various users.  If
+Enabling wildcard and fuzzy searches takes more computing power, memory, and storage space, but does prove useful for various users.  If
 you'd like to try wildcard searches, you can enable them here:
 
 <$checkbox tiddler="$:/plugins/hoelzro/full-text-search/EnableFuzzySearching" field="text" checked="yes" unchecked="" default="">
-Enable wildcard searches? (this will require an index rebuild)
+Enable wildcard/fuzzy searches? (this will require an index rebuild)
 </$checkbox>
 
 </$set>
