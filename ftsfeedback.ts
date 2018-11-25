@@ -21,7 +21,7 @@ module FTSFeedback {
         }
       });
 
-      options.wiki.setTiddlerData(targetTiddler, {messages: listOfFeedback});
+      options.wiki.setTiddlerData(targetTiddler, listOfFeedback);
     };
   }
 }

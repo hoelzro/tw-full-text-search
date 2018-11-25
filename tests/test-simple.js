@@ -588,7 +588,7 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             var results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
             expect(results).not.toContain('Experiment with Formatting');
 
-            let feedback = wiki.getTiddlerData('$:/temp/fts-feedback', {messages:[]})['messages'];
+            let feedback = wiki.getTiddlerData('$:/temp/fts-feedback', []);
             expect(feedback).toContain("It looks like you're trying to perform a fuzzy search; you'll need to enable fuzzy searching in the FTS settings");
         });
 
@@ -618,7 +618,7 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
 
             var results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
             expect(results).toContain('Experiment with Formatting');
-            var messages = wiki.getTiddlerData('$:/temp/fts-feedback', {messages:[]})['messages'];
+            var messages = wiki.getTiddlerData('$:/temp/fts-feedback', []);
             expect(messages.length).toBe(0);
         });
 
@@ -635,7 +635,7 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             await buildIndex();
 
             results = wiki.filterTiddlers('[ftsearch[format*ing]ftsfeedback[$:/temp/fts-feedback]]');
-            var messages = wiki.getTiddlerData('$:/temp/fts-feedback', {messages:[]})['messages'];
+            var messages = wiki.getTiddlerData('$:/temp/fts-feedback', []);
             expect(messages.length).toBe(0);
         });
     });
