@@ -2,7 +2,7 @@ created: 20181007153959728
 modified: 20181007162358907
 tags: 
 title: Query Examples
-list: [[Examples/Simple Stemming]] Examples/Relevance Examples/Synonyms
+list: [[Examples/Simple Stemming]] Examples/Relevance Examples/Synonyms [[Examples/Wildcard Searches]] [[Examples/Fuzzy Searching]]
 
 \define reveal-example(title)
 <$set name="revealState" value=<<qualify "$:/state-reveal-$title$">>>
