@@ -3,6 +3,29 @@ type: text/vnd.tiddlywiki
 
 ! Release History
 
+!! 1.1.0 (2018-11-24)
+
+!!! Bug Fixes
+
+  * The plugin no longer indexes draft tiddlers
+  * Refresh query results when embedding ftsearch directly ([[GH #24|https://github.com/hoelzro/tw-full-text-search/issues/24]])
+  * Fixed a bug where wikis with `__proto__` in them would fail to load from cache
+  * Fix some query relevance issues
+  * Fix a bug where indexing didn't work on non-Node installations on Chrome
+
+!!! User-facing changes
+
+  * ~TiddlyWiki 5.1.15 is now required!
+  * Added the ability to automatically index your wiki on startup (~TiddlyWiki 5.1.16 is required for this)
+  * Added lots of examples
+  * Improved indexing for wildcards/fuzzy searches, but these are now hidden behind a configuration flag due the overhead incurred
+  * Alert the user if changing their FTS settings requires an index rebuild
+
+!!! Developer changes
+
+  * Updated to lunr 2.3.5
+  * Tests now use Jasmine 3
+
 !! 1.0.3 (2018-10-07)
 
 !!! User-facing changes
