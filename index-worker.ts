@@ -153,6 +153,8 @@ module-type: library
 
     postMessage({ type: 'index', index: JSON.stringify(builder.build()) });
     close();
-})();
+})().catch(function(err) {
+    postMessage({ type: 'error', error: err.toString() });
+});
 
 // vim:sts=4:sw=4

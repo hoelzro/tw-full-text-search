@@ -148,6 +148,8 @@ module SharedIndex {
                     let fuzzySetting = wiki.getTiddlerText(FUZZY_SEARCH_TIDDLER, '');
 
                     worker.postMessage(fuzzySetting);
+                } else if(payload.type == 'error') {
+                    reject(payload.error);
                 }
             };
         });
