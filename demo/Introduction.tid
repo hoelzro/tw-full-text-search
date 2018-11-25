@@ -11,6 +11,8 @@ This plugin adds full text search capabilities to ~TiddlyWiki, which provides fe
 
 For examples of the plugin in action, have a look at [[Query Examples]].
 
+Since this plugin uses lunr.js under the hood to work its magic, you may find [[lunr's documentation on searching|https://lunrjs.com/guides/searching.html]] useful in crafting more advanced queries.
+
 ! Installation
 
 To install, drag and drop these plugins into your wiki:
