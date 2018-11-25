@@ -31,6 +31,19 @@ To install, drag and drop these plugins into your wiki:
 
 This plugin provides a filter operator named `ftsearch` which you can use in conjunction with other filter operators; it works exactly like ~TiddlyWiki's `search` operator, only you can't specify which field to search on - it always searches on title, tags, and text.
 
+There's also a filter operator named `ftsfeedback`, which allows the `ftsearch` filter operator to gather feedback into a tiddler to show the user.  This is currently used to let the user know if they're using features not supported by their configuration.  Here's an example of how to use the two in concert:
+
+```
+<$set name="ftsFeedback" value=<<qualify "$:/temp/fts-feedback">> >
+<$list filter="[ftsearch<query>ftsfeedback<ftsFeedback>]">
+</$list>
+
+<<ftsFeedback>> is a data tiddler containing feedback messages from the FTS machinery.
+</$set>
+```
+
+Because of how `ftsearch` passes information to `ftsfeedback`, you may notice that queries not supported by your configuration return a list with a single blank item - you can use `ftsfeedback` to handle that situation.
+
 ! Reporting Bugs & Source Code
 
 The source code for this plugin is available on [[GitHub|https://github.com/hoelzro/tw-full-text-search]], and ~GitHub is also where the issue tracker for this plugin lives.
