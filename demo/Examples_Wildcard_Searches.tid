@@ -1,0 +1,38 @@
+caption: Wildcard (experimental)
+created: 20181124234340089
+modified: 20181125004216892
+tags: [[Query Examples]]
+title: Examples/Wildcard Searches
+
+Wildcards are an experimental search feature that, when enabled in the settings, take a little more computing power and memory, but can provide a lot of power.  The way to use wildcards is to insert an asterisk (`*`) character into your query - this character stands in for "0 or more of any character".  For example, the query `*oo` would match any documents that contain a word that ends in "oo".  The full text search plugin uses lunr.js for its implementation, so you can naturally read more about wildcards in the [[lunr documentation|https://lunrjs.com/guides/searching.html#wildcards]].
+
+<$reveal type="match" text="uninitialized" state="$:/temp/FTS-state">
+
+In order to do anything, you'll need to build the index first:
+
+<$button>
+  Click here to generate the index
+  <$fts-action-generate-index />
+</$button>
+</$reveal>
+
+<$reveal type="match" text="initialized" state="$:/temp/FTS-state">
+<$reveal type="match" text="yes" state="$:/plugins/hoelzro/full-text-search/EnableFuzzySearching">
+
+Here's the results looking for `format*ing`:
+
+<<list-links filter:"[!is[current]!is[system]ftsearch[format*ing]]">>
+
+The tiddler `Wiping a harddrive` contains the word "formatting", which matches our wildcard query.  If it said "formating" instead, it would also match, because the `*` in the query matches any number of characters - this means that even words like "formattering" would match that query!
+
+</$reveal>
+
+<$reveal type="nomatch" text="yes" state="$:/plugins/hoelzro/full-text-search/EnableFuzzySearching">
+
+Wildcards aren't enabled; in order to try them out, you'll need to toggle this experimental setting, either here or in the control panel.  Afterwards, you'll need to rebuild the index.
+
+<$checkbox tiddler="$:/plugins/hoelzro/full-text-search/EnableFuzzySearching" field="text" checked="yes" unchecked="" default="">
+Enable wildcard searches
+</$checkbox>
+</$reveal>
+</$reveal>
