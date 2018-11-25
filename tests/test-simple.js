@@ -592,6 +592,20 @@ https://jaredforsyth.com/2017/07/05/a-reason-react-tutorial/
             expect(feedback).toContain("It looks like you're trying to perform a wildcard search; you'll need to enable wildcard/fuzzy searching in the FTS settings");
         });
 
+        it('should detect fuzzy queries when fuzzy matching is off and notify the user', async function() {
+            await disableFuzzySearch();
+            await addTiddler({
+                title: 'Experiment with Formatting'
+            });
+            await buildIndex();
+
+            var results = wiki.filterTiddlers('[ftsearch[formattign~1]ftsfeedback[$:/temp/fts-feedback]]');
+            expect(results).not.toContain('Experiment with Formatting');
+
+            let feedback = wiki.getTiddlerData('$:/temp/fts-feedback', []);
+            expect(feedback).toContain("It looks like you're trying to perform a fuzzy search; you'll need to enable wildcard/fuzzy searching in the FTS settings");
+        });
+
         it('should not prevent results from being returned if ftsfeedback is used', async function() {
             await disableFuzzySearch();
             await addTiddler({
