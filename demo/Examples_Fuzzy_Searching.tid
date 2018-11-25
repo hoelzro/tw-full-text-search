@@ -1,0 +1,38 @@
+caption: Fuzzy Searches (experimental)
+created: 20181125020408306
+modified: 20181125021125541
+tags: [[Query Examples]]
+title: Examples/Fuzzy Searching
+
+Fuzzy searches give your queries a little wiggle room; they allow you to specify an //edit distance// between word in your query and the words it matches in your wiki.  This is chiefly used to work around mispellings.  You create a fuzzy search by adding a tilde and a numeric edit distance after the word you'd like to make fuzzy.
+
+<$reveal type="match" text="uninitialized" state="$:/temp/FTS-state">
+
+In order to do anything, you'll need to build the index first:
+
+<$button>
+  Click here to generate the index
+  <$fts-action-generate-index />
+</$button>
+</$reveal>
+
+<$reveal type="match" text="initialized" state="$:/temp/FTS-state">
+<$reveal type="match" text="yes" state="$:/plugins/hoelzro/full-text-search/EnableFuzzySearching">
+
+Here's the results looking for `formattign~1`:
+
+<<list-links filter:"[!tag[Query Examples]!is[system]ftsearch[formattign~1]]">>
+
+Notice how even though we misspelled "formatting", `Wiping a harddrive` still came up in our results!  Fuzzy searches are powerful, but use them wisely - if you specify two large of an edit distance, it can bring your wiki to a halt.  They are also experimental, so please use them with a grain of salt and [[report any bugs|https://github.com/hoelzro/tw-full-text-search/issues]] you find.
+
+</$reveal>
+
+<$reveal type="nomatch" text="yes" state="$:/plugins/hoelzro/full-text-search/EnableFuzzySearching">
+
+Fuzzy searches aren't enabled; in order to try them out, you'll need to toggle this experimental setting, either here or in the control panel.  Afterwards, you'll need to rebuild the index.
+
+<$checkbox tiddler="$:/plugins/hoelzro/full-text-search/EnableFuzzySearching" field="text" checked="yes" unchecked="" default="">
+Enable fuzzy searches
+</$checkbox>
+</$reveal>
+</$reveal>

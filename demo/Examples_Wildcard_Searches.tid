@@ -1,6 +1,6 @@
 caption: Wildcard (experimental)
 created: 20181124234340089
-modified: 20181125004216892
+modified: 20181125021112605
 tags: [[Query Examples]]
 title: Examples/Wildcard Searches
 
@@ -21,9 +21,9 @@ In order to do anything, you'll need to build the index first:
 
 Here's the results looking for `format*ing`:
 
-<<list-links filter:"[!is[current]!is[system]ftsearch[format*ing]]">>
+<<list-links filter:"[!tag[Query Examples]!is[system]ftsearch[format*ing]]">>
 
-The tiddler `Wiping a harddrive` contains the word "formatting", which matches our wildcard query.  If it said "formating" instead, it would also match, because the `*` in the query matches any number of characters - this means that even words like "formattering" would match that query!
+The tiddler `Wiping a harddrive` contains the word "formatting", which matches our wildcard query.  If it said "formating" instead, it would also match, because the `*` in the query matches any number of characters - this means that even words like "formattering" would match that query!  Since wildcards are experimental, please [[report any bugs|https://github.com/hoelzro/tw-full-text-search/issues]] you find with them!
 
 </$reveal>
 
