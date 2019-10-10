@@ -37,7 +37,7 @@ Index generated.  Happy searching!
 
 <$list variable="fiveSixteenOrBetter" filter="5.1.16 [title<version>] +[sort[]first[]] +[prefix[5.1.16]]" emptyMessage="Sorry, you need TiddlyWiki 5.1.16 or greater to enable auto-indexing.">
 
-<$set name="autoIndexTiddler" value="$:/plugins/hoelzro/full-text-seach/auto-index">
+<$set name="autoIndexTiddler" value="$:/plugins/hoelzro/full-text-search/auto-index">
 
 Automatic indexing refers to a feature where your wiki is automatically indexed in the background after it's been loaded.
 
