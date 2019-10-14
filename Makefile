@@ -55,6 +55,7 @@ fts.json.tid: dist.html
 	mv .build-wiki/tiddlywiki.info.tmp .build-wiki/tiddlywiki.info
 	mkdir .build-wiki/plugins/
 	git clone https://github.com/hoelzro/tw-progress-bar .build-wiki/plugins/progress-bar
+	rm .build-wiki/plugins/progress-bar/README.md
 
 plugin.info: plugin.info.in
 	jq --arg version $(shell git describe) '.version |= $$version' $^ > $@
