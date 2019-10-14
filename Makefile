@@ -9,7 +9,9 @@ TEST_FILES=$(wildcard tests/*.js)
 
 all: dist.html fts.json.tid
 
-test: .test-wiki $(JS_FILES) $(TID_FILES) $(TEST_FILES) plugin.info
+test: run-tests check-plugin-contents
+
+run-tests: .test-wiki $(JS_FILES) $(TID_FILES) $(TEST_FILES) plugin.info
 	mkdir -p $</plugins/full-text-search
 	mkdir -p $</tiddlers/tests
 	cp *.js $</plugins/full-text-search
@@ -19,6 +21,10 @@ test: .test-wiki $(JS_FILES) $(TID_FILES) $(TEST_FILES) plugin.info
 	cp -R tests/ $</tiddlers/tests/
 	cp $(DEMO_FILES) $</tiddlers/
 	tiddlywiki $< --output $(shell pwd) --rendertiddler '$$:/core/save/all' /dev/null text/plain | perl -pnle 'if(/\d+\s+test.*(\d+)\s+failure/ && $$1 > 0) { $$failed = 1 } END { exit(1) if($$failed) }'
+
+check-plugin-contents: .build-wiki
+	output=$$(mktemp) && tiddlywiki $< --rendertiddler '$$:/core/ui/PluginInfo/Default/contents' $$output text/plain '' currentTiddler '$$:/plugins/hoelzro/progress-bar' && perl -nle 'exit 1 if /\S/ && !m{^\$$:}' $$output
+	output=$$(mktemp) && tiddlywiki $< --rendertiddler '$$:/core/ui/PluginInfo/Default/contents' $$output text/plain '' currentTiddler '$$:/plugins/hoelzro/full-text-search' && perl -nle 'exit 1 if /\S/ && !m{^\$$:}' $$output
 
 dist.html: .build-wiki $(JS_FILES) $(TID_FILES) $(DEMO_FILES) plugin.info
 	mkdir -p $</plugins/full-text-search
